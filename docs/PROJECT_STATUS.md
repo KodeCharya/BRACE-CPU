@@ -1,51 +1,31 @@
 # Project Status — BRACE-CPU
 
-**Current phase:** Phase 12 — Reproducibility audit (COMPLETE); Phase 13 — Manuscript (COMPLETE, source only)  
-**Audit status:** PASSED (3 defects fixed + rerun; docs/INDEPENDENT_AUDIT.md)  
-**Last updated:** 2026-11-05
+**Current phase:** Publication-readiness validation (Phases A–H) — IN PROGRESS  
+**Sub-phase:** Phase A — Evidence audit (COMPLETE); Phase B — Statistical review (COMPLETE); Phase C — Literature expansion (IN PROGRESS)  
+**Last updated:** 2026-11-05  
+**Git:** branch `master`, commit `6c00827` (baseline backup committed)
 
-## Completed work
-All phases 0–13 complete:
-- Phase 0: Environment audit (docs/ENVIRONMENT_REPORT.md)
-- Phase 1: Literature review (docs/LITERATURE_REVIEW.md, NOVELTY_ANALYSIS.md, RELATED_WORK_MATRIX.csv) — 5 verified arXiv citations
-- Phase 2: Research protocol (docs/RESEARCH_PROTOCOL.md)
-- Phase 3: Numerical solvers — 8 tests pass
-- Phase 4: Dataset — 675 trajectories, 5 partitions, SHA-256 verified, no partition overlap
-- Phase 5: MLP surrogate — 17K params, increment formulation, beats identity baseline
-- Phase 6: Risk + calibration — AUROC 0.988; calibration null result
-- Phase 7: Controller policies A–H with wall-clock cost accounting
-- Phase 8: Pilot (1,260 records)
-- Phase 9: Main (3,500 records, corrected rerun exp_20261105_134910_63a5fa94)
-- Phase 10: Ablation + robustness (docs/results/processed/ablation_output.txt)
-- Phase 11: Statistical analysis (docs/STATISTICAL_AUDIT.md) — paired tests, effect sizes
-- Phase 12: Reproducibility audit (docs/REPRODUCIBILITY_AUDIT.md) — inference deterministic; retraining moderate variation
-- Phase 13: Manuscript — paper/main.tex, paper/references.bib (5 verified citations), paper/figures/, paper/supplementary_material.md
+## Completed
+- Phase A: docs/PUBLICATION_EVIDENCE_AUDIT.md — all claims traced to corrected raw records; 3 discrepancies found (D1–D5)
+- Phase B: docs/PUBLICATION_STATISTICAL_REVIEW.md — full recalculation; paired tests; effect sizes; calibration null confirmed
+- Git baseline commit `6c00827` created as backup before modifications
 
-## Audit reports (new)
-- docs/INDEPENDENT_AUDIT.md — overall audit, claim classifications
-- docs/STATISTICAL_AUDIT.md — recalculated metrics, paired tests, effect sizes
-- docs/LEAKAGE_AUDIT.md — no leakage found
-- docs/REPRODUCIBILITY_AUDIT.md — reproducibility assessment
-- docs/COMPUTATIONAL_FAIRNESS_AUDIT.md — defects CF-1/CF-2 found & fixed
-- docs/FINAL_RESULTS.md — headline numbers
+## Key defects found in manuscript
+- D1: C/E/F table rows labeled "nominal 0.05" but show cross-budget aggregate (relL2 0.049, frac 0.66). At actual budget 0.05: relL2 0.142, frac 0.20. MISLABELED.
+- D2: Text claims C better than G at matched ~20% frac using 0.049 (aggregate) — wrong; actual matched-frac C = 0.142 vs G 0.159.
+- D3: Exact p-values below 1e-30 not numerically meaningful; report as p < 0.001.
+- D4: Negative Cohen's d confusing; clarify sign convention.
+- D5: Duplicate `\section{Conclusion}` (complete + placeholder) — remove placeholder.
+- Manuscript missing: explicit hypotheses (H0/H1), numerical solver details, threat-to-validity section, several required figures/tables.
 
-## Key results (corrected, 5 seeds)
-- G BRACE vs A neural: d=−1.45 to −2.03, p<1e-30 (supported)
-- Calibration (F vs C): p=0.29, ns (null, honestly reported)
-- G enforces budget exactly; C/E/F overshoot to ~66% at nominal 5%
-- ~50% error reduction at 40% budget (57.5% at budget 0.4)
-- OOD degrades (fail_rate ~0.67)
+## Remaining
+- Phase C: Expanded literature review (docs/EXPANDED_LITERATURE_REVIEW.md)
+- Phase D: Research positioning (docs/FINAL_RESEARCH_POSITIONING.md) — title question (calibration adds no benefit)
+- Phase E: Manuscript refinement (fix D1–D5, add missing sections, qualified language)
+- Phase F: Figures/tables audit + generation from raw data
+- Phase G: Reproduction guide (docs/REPRODUCTION_GUIDE.md)
+- Phase H: LaTeX compilation check + docs/MANUSCRIPT_VALIDATION.md
+- Phase I: Final publication-readiness report (docs/PUBLICATION_READINESS_REPORT.md)
 
-## Claim classification (docs/INDEPENDENT_AUDIT.md)
-Supported: RQ1, RQ3(budget), RQ4, RQ5, ~50% reduction
-Unsupported/null: RQ2 (calibration), calibration value
-Partially supported: RQ6 (robustness)
-
-## Resource consumption
-Within 8 GiB RAM / 4-core CPU limits throughout. Sequential execution. No GPU/cloud.
-
-## Manuscript status
-paper/main.tex (complete source), paper/references.bib (5 verified citations), paper/figures/ (2 figures), paper/supplementary_material.md. NOT compiled (no LaTeX installed). NOT submitted anywhere.
-
-## Next / final
-Project complete per completion criteria. Honest publication-readiness assessment: manuscript source complete; results audit-passed; would benefit from LaTeX compilation check and broader literature confirmation of novelty before any submission (submission not authorized).
+## Next action
+Phase C: Write expanded literature review covering hybrid neural-numerical solvers, adaptive correction, learned error indicators, selective prediction, risk-aware inference, budget-constrained computation, conformal prediction in SciML, OOD reliability.
