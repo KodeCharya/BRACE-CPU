@@ -1,0 +1,7 @@
+numpy>=2.5
+scipy>=1.18
+matplotlib>=3.11
+PyYAML>=6.0
+tqdm>=4.67
+pytest>=8.0
+torch>=2.15+cpu

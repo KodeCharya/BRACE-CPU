@@ -1,0 +1,69 @@
+
+=== A1 Feature ablation (seed 0) ===
+  combined (all 6 feats): AUROC=0.9910
+  norm_residual                AUROC=0.9788
+  temporal_inconsistency       AUROC=0.9739
+  mass_deviation               AUROC=0.5836
+  increment_magnitude          AUROC=0.9745
+  gradient_magnitude           AUROC=0.8039
+  nu                           AUROC=0.6837
+  w/o norm_residual            AUROC=0.9771
+  w/o temporal_inconsistency   AUROC=0.9911
+  w/o mass_deviation           AUROC=0.9909
+  w/o increment_magnitude      AUROC=0.9910
+  w/o gradient_magnitude       AUROC=0.9909
+  w/o nu                       AUROC=0.9906
+
+=== A2 Calibration-set size sweep (seed 0) ===
+  cal fraction=0.25 (n=1249): ECE=0.0135 Brier=0.0256 AUROC=0.9894 P=0.905 R=0.682
+  cal fraction=0.50 (n=2499): ECE=0.0096 Brier=0.0240 AUROC=0.9894 P=0.876 R=0.738
+  cal fraction=1.00 (n=4998): ECE=0.0111 Brier=0.0242 AUROC=0.9894 P=0.882 R=0.730
+
+=== A3 OOD robustness (seed 0) ===
+  OOD: n=4339 fail_rate=0.661 mean_err=0.01393 AUROC=0.8986
+
+=== A1 Feature ablation (seed 1) ===
+  combined (all 6 feats): AUROC=0.9872
+  norm_residual                AUROC=0.9779
+  temporal_inconsistency       AUROC=0.9706
+  mass_deviation               AUROC=0.5876
+  increment_magnitude          AUROC=0.9711
+  gradient_magnitude           AUROC=0.8002
+  nu                           AUROC=0.6779
+  w/o norm_residual            AUROC=0.9743
+  w/o temporal_inconsistency   AUROC=0.9873
+  w/o mass_deviation           AUROC=0.9872
+  w/o increment_magnitude      AUROC=0.9872
+  w/o gradient_magnitude       AUROC=0.9869
+  w/o nu                       AUROC=0.9869
+
+=== A2 Calibration-set size sweep (seed 1) ===
+  cal fraction=0.25 (n=1249): ECE=0.0072 Brier=0.0282 AUROC=0.9856 P=0.851 R=0.723
+  cal fraction=0.50 (n=2499): ECE=0.0083 Brier=0.0284 AUROC=0.9856 P=0.859 R=0.707
+  cal fraction=1.00 (n=4998): ECE=0.0079 Brier=0.0284 AUROC=0.9856 P=0.859 R=0.706
+
+=== A3 OOD robustness (seed 1) ===
+  OOD: n=4339 fail_rate=0.678 mean_err=0.01416 AUROC=0.9158
+
+=== A1 Feature ablation (seed 2) ===
+  combined (all 6 feats): AUROC=0.9882
+  norm_residual                AUROC=0.9798
+  temporal_inconsistency       AUROC=0.9683
+  mass_deviation               AUROC=0.5379
+  increment_magnitude          AUROC=0.9688
+  gradient_magnitude           AUROC=0.7939
+  nu                           AUROC=0.6806
+  w/o norm_residual            AUROC=0.9712
+  w/o temporal_inconsistency   AUROC=0.9884
+  w/o mass_deviation           AUROC=0.9881
+  w/o increment_magnitude      AUROC=0.9883
+  w/o gradient_magnitude       AUROC=0.9882
+  w/o nu                       AUROC=0.9873
+
+=== A2 Calibration-set size sweep (seed 2) ===
+  cal fraction=0.25 (n=1249): ECE=0.0062 Brier=0.0278 AUROC=0.9854 P=0.829 R=0.749
+  cal fraction=0.50 (n=2499): ECE=0.0080 Brier=0.0280 AUROC=0.9854 P=0.811 R=0.769
+  cal fraction=1.00 (n=4998): ECE=0.0070 Brier=0.0279 AUROC=0.9854 P=0.818 R=0.764
+
+=== A3 OOD robustness (seed 2) ===
+  OOD: n=4339 fail_rate=0.686 mean_err=0.01424 AUROC=0.9031

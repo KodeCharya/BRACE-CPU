@@ -1,0 +1,31 @@
+{
+  "experiment_id": "exp_20261105_134910_63a5fa94",
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "n_test_trajectories": 25,
+  "n_steps": 60,
+  "budgets": [
+    0.05,
+    0.1,
+    0.2,
+    0.4,
+    0.6
+  ],
+  "tau": 0.01,
+  "L": 1.0,
+  "epochs": 40,
+  "stride": 4,
+  "dataset_checksum": "350668727f9d73a61fc0d0d0bba198f24b34b90b48d77efd334aee1eb95f6c62",
+  "manifest_partitions": {
+    "train": 300,
+    "validation": 75,
+    "calibration": 75,
+    "test": 150,
+    "ood_test": 75
+  }
+}

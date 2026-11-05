@@ -1,0 +1,23 @@
+{
+  "record_id": "b5c2e13ae135",
+  "experiment_id": "exp_20261105_134910_63a5fa94",
+  "timestamp": "2026-11-05T08:23:02.838867+00:00",
+  "seed": 2,
+  "policy": "D_adaptive_threshold",
+  "budget": 0.2,
+  "threshold": 4.313626942288243,
+  "test_trajectory_id": "burgers_s46000010_n64_nu0.02358423962280288",
+  "n_steps": 60,
+  "intervention_count": 60,
+  "intervention_fraction": 1.0,
+  "rel_l2_mean": 3.001310573725226e-08,
+  "rel_l2_max": 3.537476338087048e-08,
+  "rel_l2_final": 2.8566126979997955e-08,
+  "neural_wall_s": 0.0,
+  "solver_wall_s": 0.01155191300676961,
+  "controller_wall_s": 0.015377821999209118,
+  "prepare_wall_s": 4.809990059584379e-07,
+  "total_wall_s": 0.026929735005978728,
+  "solver_calls": 60,
+  "nu": 0.02358423962280288
+}
