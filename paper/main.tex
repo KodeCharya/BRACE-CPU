@@ -20,7 +20,7 @@
 \begin{abstract}
 Can a lightweight neural PDE surrogate achieve a better accuracy-versus-computational-cost trade-off by selectively invoking numerical computation guided by prediction-risk estimates? We investigate this question through BRACE-CPU (Budgeted Risk-Adaptive Computing Engine), an empirical CPU-only study pairing a small multi-layer perceptron (MLP) surrogate for the one-dimensional viscous Burgers' equation with a failure-risk estimator and a budget-constrained numerical-correction controller. BRACE-CPU ranks candidate intervention steps by predicted failure probability and intervenes on the highest-risk steps subject to a measured computational budget (intervention count and wall-clock solver time). We evaluate against six baselines---pure neural, pure numerical, fixed-threshold, adaptive-threshold, uncalibrated risk, calibrated risk, and an oracle---across intervention budgets of 5\%, 10\%, 20\%, 40\%, and 60\%, using five independent random seeds and identical test trajectories for paired comparison. All experiments run on a CPU-only machine (Intel i5-6500, 4 cores, 8 GiB RAM) without GPU or cloud compute.
 
-Our findings are nuanced. Risk features (dominated by the normalized PDE residual) predict surrogate failure well in-distribution (AUROC $\approx 0.99$), but calibration via Platt scaling provides \emph{no measurable benefit} over an uncalibrated risk score (ECE and Brier score identical; paired $p=0.29$)---a null result we report rather than suppress. Budget-constrained risk-ranked intervention (BRACE-CPU) enforces the intervention budget \emph{exactly}, whereas fixed-threshold and risk-threshold policies overshoot their nominal budget as long-horizon error accumulates. Selective numerical correction substantially improves long-horizon reliability over pure neural rollout (large effect sizes), reaching roughly a 50\% error reduction at a 40\% intervention budget, though it does not attain pure-numerical accuracy at low budgets and degrades under out-of-distribution viscosity shifts. We explicitly bound our claims: no distribution-free guarantees under shift are made, and the calibrated + budget-ranked combination is presented as an empirical CPU-focused study rather than a claim of novelty over prior hybrid neural--numerical solvers.
+Our findings are nuanced. Risk features (dominated by the normalized PDE residual) predict surrogate failure well in-distribution (AUROC $\approx 0.99$), but calibration via Platt scaling provides \emph{no measurable benefit} over an uncalibrated risk score (ECE and Brier score identical; paired $p=0.29$)---a null result we report rather than suppress. Budget-constrained risk-ranked intervention enforces the intervention budget \emph{exactly}, whereas fixed-threshold and risk-threshold policies overshoot their nominal budget as long-horizon error accumulates. Selective numerical correction substantially improves long-horizon reliability over pure neural rollout (large effect sizes), reaching roughly a 50\% error reduction at a 40\% intervention budget. However, an honest accounting of the two-pass procedure's preparation cost ($\sim 54$ ms per rollout, 84--86\% of total cost) reveals that BRACE consumes more total computation than threshold-based baselines at comparable intervention rates; the advantage lies in \emph{budget predictability}, not raw accuracy or cost efficiency. We explicitly bound our claims: no distribution-free guarantees under shift are made, and the calibrated + budget-ranked combination is presented as an empirical CPU-focused study rather than a claim of novelty over prior hybrid neural--numerical solvers.
 
 \vspace{1em}
 \textbf{Keywords:} neural PDE surrogate, selective prediction, uncertainty calibration, computational budget, Burgers' equation, CPU-only scientific ML
@@ -81,7 +81,11 @@ A small MLP (3 hidden layers, 64 units, ReLU, $\sim$17K parameters, FP32, CPU-on
 Risk features (normalized PDE residual, temporal inconsistency, mass-conservation deviation, increment magnitude, gradient magnitude, viscosity) are combined into a feature vector; a regularized logistic regression maps features to raw failure logits. Platt scaling on a held-out calibration set converts logits to calibrated failure probabilities $P(\text{error}>\tau \mid \text{features})$. Calibration is never performed on test labels; the exchangeability assumption is reported explicitly. \emph{Experimental results (Section \ref{sec:results-calibration}) show calibration provides no measurable benefit over the uncalibrated risk score; this null result is reported rather than suppressed.}
 
 \subsection{Budget-aware controller}
-Eight policies are compared (Section \ref{sec:method}): always neural (A), always numerical (B), fixed residual threshold (C), adaptive threshold (D), uncalibrated risk (E), calibrated risk (F), budget-constrained risk-ranked intervention (G, BRACE-CPU), and oracle (H, evaluation only). Every neural inference, risk/computation decision, and solver invocation is timed; none is counted as free. Budgets of 5\%--60\% refer to the fraction of rollout steps on which the numerical solver may be invoked, alongside measured wall-clock solver cost. Policy G pre-selects the top-$k$ riskiest steps ($k=\text{budget}\times n_\text{steps}$) on an all-surrogate trajectory and intervenes exactly at those steps, thereby enforcing the budget; note this pre-scoring is itself a one-time cost reported separately.
+Eight policies are compared: always neural (A), always numerical (B), fixed residual threshold (C), adaptive threshold (D), uncalibrated risk (E), calibrated risk (F), budget-constrained risk-ranked intervention (G, BRACE-CPU), and oracle (H, evaluation only). Every neural inference, risk/computation decision, and solver invocation is timed; none is counted as free. Budgets of 5\%--60\% refer to the fraction of rollout steps on which the numerical solver may be invoked, alongside measured wall-clock solver cost.
+
+Policy G operates in two phases. \emph{Phase 1 (preparation):} a full all-surrogate trajectory is simulated (60 steps, 0 interventions); at each step, the normalized PDE residual and other risk features are computed and a failure probability is predicted by the risk model. The top-$k$ riskiest step indices are selected where $k=\text{budget}\times n_\text{steps}$. \emph{Phase 2 (execution):} the controlled rollout intervenes at the pre-selected indices using one step of the numerical solver from the current state, and uses the surrogate prediction elsewhere. The preparation phase costs $\sim 54$ ms per rollout (60 neural predictions + risk computation) and is reported separately from execution cost. Note that risk rankings are computed on an uncorrected trajectory and may be stale after corrections alter subsequent states.
+
+An alternative \emph{single-pass online} variant (G\_ONLINE) scores risk during the actual rollout, maintaining a running set of intervention candidates and intervening when the current risk exceeds an adaptive threshold while respecting the exact budget. This eliminates the preparation cost entirely and scores risk on post-correction states. G\_ONLINE is evaluated alongside G\_TWOPASS (two-pass) in our experiments.
 
 \subsection{No future ground truth in the operational controller}
 Operational policies A--G decide interventions using only the current state, the surrogate's own prediction, the PDE parameters, and the time---never future ground-truth solutions. The oracle policy (H) consults the true next state for \emph{evaluation only} and is never available to the operational controller.
@@ -108,23 +112,38 @@ seeds. All experiments run on a CPU-only machine (Intel i5-6500, 4 cores,
 \label{sec:results-acc-cost}
 
 Table \ref{tab:summary} reports mean relative L2 error, 95\% confidence
-intervals, intervention fraction, and total wall-clock cost per rollout.
-Figure \ref{fig:pareto} shows the Pareto frontier of accuracy versus
-intervention cost; Figure \ref{fig:brace-budget} shows BRACE-CPU accuracy
-versus intervention budget.
+intervals, intervention fraction, and wall-clock cost per rollout (with
+preparation cost reported separately for the two-pass G). Figure
+\ref{fig:pareto} shows the Pareto frontier of accuracy versus intervention
+cost; Figure \ref{fig:brace-budget} shows BRACE-CPU accuracy versus
+intervention budget for both the two-pass (G\_TWOPASS) and single-pass online
+(G\_ONLINE) variants. Figure \ref{fig:budget-compliance} visualizes budget
+compliance: G enforces its nominal budget exactly, whereas threshold policies
+overshoot substantially.
 
 Pure neural rollout (A) is least accurate (rel L2 $0.2550 \pm 0.0207$) but
 cheapest ($8.5$ ms, no solver). Pure numerical (B) is accurate (rel L2
 $\approx 0$, degenerate---it uses the same solver as the reference generator)
-but costly ($11.0$ ms, 100\% intervention). The oracle (H) reaches rel L2
-$0.0042 \pm 0.0004$ at 95.5\% intervention ($21.7$ ms), showing the headroom
-available with perfect foresight.
+but costly ($11.0$ ms, 100\% intervention).
 
-BRACE-CPU (G) reduces error monotonically with budget: $0.222$ (5\%) $\to$
-$0.197$ (10\%) $\to$ $0.159$ (20\%) $\to$ $0.108$ (40\%) $\to$ $0.065$ (60\%).
-Relative to pure neural, error reductions are 13\%, 23\%, 38\%, 58\%, 75\%---
-so roughly a 50\% error reduction at a 40\% intervention budget, at $9.6$ ms
-total wall-clock plus a one-time $\sim 54$ ms preparation cost.
+BRACE-CPU reduces error monotonically with budget. For the two-pass G:
+$0.222$ (5\%) $\to$ $0.197$ (10\%) $\to$ $0.159$ (20\%) $\to$ $0.108$ (40\%)
+$\to$ $0.065$ (60\%). For the single-pass G\_ONLINE: $0.215$ (5\%) $\to$
+$0.182$ (10\%) $\to$ $0.132$ (20\%) $\to$ $0.073$ (40\%) $\to$ $0.034$ (60\%).
+Relative to pure neural, error reductions reach roughly 50\% at a 40\%
+intervention budget for G\_TWOPASS and exceed 70\% for G\_ONLINE.
+
+\textbf{Cost accounting.} The two-pass G requires a one-time preparation phase
+($\sim 54$ ms per rollout) that simulates an all-surrogate trajectory and
+scores risk at each step. This preparation cost constitutes 84--86\% of G's
+true total cost. G\_ONLINE eliminates preparation entirely by scoring risk
+online during the rollout, at the cost of interleaving risk computation with
+execution. At matched intervention fraction ($\approx 20\%$), C costs $16.8$ ms
+while G\_ONLINE costs $57.3$ ms and G\_TWOPASS costs $63.8$ ms (true total
+including preparation). BRACE-CPU therefore consumes more total computation
+than threshold-based baselines at comparable intervention rates; its advantage
+lies in \emph{budget predictability} (exact enforcement), not raw accuracy or
+cost efficiency.
 
 \subsection{Budget enforcement}
 \label{sec:results-budget}
@@ -145,12 +164,15 @@ average intervention fraction is $\approx 0.66$, which is \emph{not} the
 intervention fraction at a nominal 5\% budget.
 
 At a matched actual intervention fraction ($\approx 20\%$), C (nominal 5\%, actual
-20.2\%, rel L2 $0.142$) is marginally more accurate than G (budget 20\%, rel L2
-$0.159$), but only because C intervenes $\sim 3\times$ more than its nominal
-budget. BRACE-CPU's advantage is \emph{budget predictability plus low online
-cost}, not raw accuracy at equal spend: G intervenes exactly 20\% of steps at
-$9.1$ ms/rollout, whereas C intervenes 20.2\% at $15.6$ ms/rollout and would
-intervene 66\% of steps if allowed to follow its threshold unconstrained.
+20.2\%, rel L2 $0.142$, cost $16.8$ ms) is marginally less accurate than
+G\_ONLINE (budget 20\%, rel L2 $0.132$, cost $57.3$ ms) but $3.4\times$ cheaper.
+G\_TWOPASS (budget 20\%, rel L2 $0.159$, cost $63.8$ ms) is the least accurate
+and most expensive at matched intervention fraction. BRACE-CPU's advantage is
+\emph{budget predictability}, not raw accuracy or cost efficiency: G enforces
+its budget exactly, whereas C reaches $\approx 20\%$ actual intervention only
+by nominally targeting 5\%---a 4$\times$ budget overshoot. If the hard constraint
+is a computational budget, BRACE-CPU delivers it; if the constraint is accuracy
+per millisecond, C is preferable.
 
 \subsection{Calibration}
 \label{sec:results-calibration}
@@ -190,6 +212,19 @@ mean error $\sim 0.014$, and AUROC degrades to $\sim 0.90$. Performance
 degrades gracefully with $\nu$; BRACE-CPU becomes less reliable under genuine
 extrapolation into unseen parameter regimes.
 
+\subsection{Single-pass online versus two-pass BRACE}
+\label{sec:results-single-pass}
+
+We also evaluate a single-pass online variant (G\_ONLINE) that scores risk during
+the actual rollout, eliminating the $\sim 54$ ms preparation phase. G\_ONLINE
+enforces the exact budget while computing risk on the actual (post-correction)
+trajectory, avoiding stale rankings from the two-pass procedure. At budget 20\%,
+G\_ONLINE achieves rel L2 $0.132$ (vs $0.159$ for G\_TWOPASS) at a true cost of
+$57.3$ ms (vs $63.8$ ms), with $|d|=0.55$, $p<0.001$ (paired, 5 seeds). At budget
+60\%, the accuracy gain widens: rel L2 $0.034$ vs $0.065$ at $62.1$ ms vs $64.5$ ms.
+The single-pass online algorithm strictly dominates the two-pass procedure on both
+accuracy and true cost, and is recommended as the primary BRACE-CPU implementation.
+
 \subsection{Ablation}
 \label{sec:ablation}
 
@@ -199,6 +234,17 @@ Ablation studies (seed 0--2) isolate component contributions:
 \item \textbf{Calibration-set size:} ECE/Brier are stable across 25\%/50\%/100\% calibration-set sizes ($0.006$--$0.014$ / $0.024$--$0.028$); AUROC unchanged. Larger calibration sets do not improve calibration.
 \item \textbf{Model:} a small MLP ($\sim 17$K parameters) suffices; larger operators were not required.
 \end{itemize}
+
+\section{Threats to Validity}
+\label{sec:threats}
+
+\textbf{Internal validity.} Policy comparisons use identical test trajectories within each seed (paired design); statistical tests account for the crossed dependence structure (seed $\times$ trajectory). The C vs G comparison at matched intervention fraction is not significant at the trajectory level ($p=0.32$, $n=25$), and should not be interpreted as a demonstrated accuracy advantage for either policy at equal actual cost.
+
+\textbf{External validity.} Results are specific to 1D viscous Burgers' equation on a periodic domain with 64 grid points, a single lightweight MLP architecture, and CPU-only execution on an Intel i5-6500. Generalization to 2D/3D PDEs, other surrogate architectures, or GPU hardware is not demonstrated.
+
+\textbf{Construct validity.} The budget is defined as intervention count, not wall-clock time. Two policies with the same intervention count may differ in wall-clock cost (e.g., G has high risk-computation overhead). All wall-clock measurements are reported alongside intervention counts to avoid conflating the two.
+
+\textbf{Statistical conclusion validity.} With only 5 seeds, between-seed uncertainty is estimated with limited precision. Multiple comparisons (6 pairwise tests) increase the family-wise error rate; the strongest results (G vs A) survive Bonferroni correction ($\alpha \approx 0.008$), but marginal results should be interpreted cautiously.
 
 \section{Limitations}
 \label{sec:limitations}
@@ -224,8 +270,10 @@ large effect sizes). However, calibration provides no measurable benefit (a
 reported null result), and threshold-based policies cannot be relied on to honor
 a stated computational budget---they overshoot under error accumulation.
 BRACE-CPU's concrete contribution is \emph{budget-predictable, risk-ranked
-selective numerical correction} with low online cost, evaluated under strict
-CPU/RAM constraints with real wall-clock cost accounting.
+selective numerical correction} with
+\emph{honest cost accounting}: the two-pass procedure's preparation cost
+($\sim 54$ ms per rollout, 84--86\% of total) is fully reported, and a
+single-pass online variant eliminates it while improving accuracy.
 
 The work is not the first neural PDE surrogate, calibration method, or
 selective-prediction method; ANCHOR \citep{roy2025anchor} and related hybrid
@@ -243,23 +291,31 @@ Code, datasets, raw results, and configuration files are retained locally under 
 
 \begin{table}[h]
 \centering
-\caption{Main results: mean relative L2 error, 95\% CI, intervention fraction, and total wall-clock cost per rollout (5 seeds). B (always numerical) is degenerate---it uses the same solver as the reference generator. C, E, and F are shown at their nominal 5\% budget; they overshoot to actual intervention fractions of 0.202, 0.224, and 0.224 respectively because error accumulation drives the surrogate across thresholds. G (BRACE-CPU) enforces its budget exactly at every level.}
+\caption{Main results: mean relative L2 error, 95\% CI, intervention fraction, and TRUE total wall-clock cost per rollout (5 seeds, including preparation cost for the two-pass G). B (always numerical) is degenerate---it uses the same solver as the reference generator. C, E, and F are shown at their nominal 5\% budget; they overshoot to actual intervention fractions of 0.202, 0.224, and 0.224 respectively because error accumulation drives the surrogate across thresholds. G enforces its budget exactly at every level. Costs for G\_TWOPASS include $\sim 54$ ms preparation (84--86\% of total).}
 \label{tab:summary}
-\begin{tabular}{lrrrrr}
+\begin{tabular}{lrrrrrr}
 \toprule
-Policy & Budget & rel L2 mean & 95\% CI & Intervention frac. & Total ms \\
+Policy & Budget & rel L2 mean & 95\% CI & Intervention frac. & Exec ms & True total ms \\
 \midrule
-A always neural & --- & 0.2550 & 0.0207 & 0.000 & 8.50 \\
-B always numerical & --- & 0.0000 & 0.0000 & 1.000 & 10.98 \\
-H oracle & --- & 0.0042 & 0.0004 & 0.955 & 21.70 \\
-G BRACE & 0.05 & 0.2217 & 0.0175 & 0.050 & 8.67 \\
-G BRACE & 0.10 & 0.1970 & 0.0162 & 0.100 & 8.82 \\
-G BRACE & 0.20 & 0.1588 & 0.0152 & 0.200 & 9.09 \\
-G BRACE & 0.40 & 0.1083 & 0.0128 & 0.400 & 9.63 \\
-G BRACE & 0.60 & 0.0645 & 0.0088 & 0.600 & 10.15 \\
-C fixed threshold & 0.05 (nom.) & 0.1418 & 0.0092 & 0.202 & 15.62 \\
-E uncalibrated risk & 0.05 (nom.) & 0.1364 & 0.0110 & 0.224 & 50.85 \\
-F calibrated risk & 0.05 (nom.) & 0.1364 & 0.0110 & 0.224 & 61.61 \\
+A always neural & --- & 0.2550 & 0.0207 & 0.000 & 8.50 & 8.50 \\
+B always numerical & --- & 0.0000 & 0.0000 & 1.000 & 10.98 & 10.98 \\
+H oracle & --- & 0.0042 & 0.0004 & 0.955 & 21.70 & 21.70 \\
+\midrule
+G\_TWOPASS & 0.05 & 0.2217 & 0.0175 & 0.050 & 9.26 & 63.30 \\
+G\_TWOPASS & 0.10 & 0.1970 & 0.0162 & 0.100 & 9.14 & 63.67 \\
+G\_TWOPASS & 0.20 & 0.1588 & 0.0152 & 0.200 & 9.09 & 63.79 \\
+G\_TWOPASS & 0.40 & 0.1083 & 0.0128 & 0.400 & 9.63 & 64.29 \\
+G\_TWOPASS & 0.60 & 0.0645 & 0.0088 & 0.600 & 10.15 & 64.50 \\
+\midrule
+G\_ONLINE & 0.05 & 0.2152 & 0.0168 & 0.050 & 55.17 & 55.17 \\
+G\_ONLINE & 0.10 & 0.1825 & 0.0139 & 0.100 & 55.79 & 55.79 \\
+G\_ONLINE & 0.20 & 0.1323 & 0.0095 & 0.200 & 57.27 & 57.27 \\
+G\_ONLINE & 0.40 & 0.0730 & 0.0050 & 0.400 & 59.86 & 59.86 \\
+G\_ONLINE & 0.60 & 0.0343 & 0.0025 & 0.600 & 62.14 & 62.14 \\
+\midrule
+C fixed threshold & 0.05 (nom.) & 0.1418 & 0.0092 & 0.202 & 15.62 & 15.62 \\
+E uncalibrated risk & 0.05 (nom.) & 0.1364 & 0.0110 & 0.224 & 50.85 & 50.85 \\
+F calibrated risk & 0.05 (nom.) & 0.1364 & 0.0110 & 0.224 & 61.61 & 61.61 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -281,16 +337,23 @@ AUROC & 0.9879 $\pm$ 0.0021 & 0.9879 $\pm$ 0.0021 \\
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.6\textwidth]{paper/figures/pareto_accuracy_vs_intervention.png}
-\caption{Accuracy versus intervention cost across all policies (corrected results). Each point is one (policy, budget) setting averaged over 5 seeds.}
+\includegraphics[width=0.6\textwidth]{paper/figures/pareto_accuracy_vs_true_cost.png}
+\caption{Accuracy versus TRUE total wall-clock cost (including preparation) across all policies. Each point is one (policy, budget) setting averaged over 5 seeds. G\_TWOPASS appears at high cost due to its $\sim 54$ ms preparation phase; G\_ONLINE eliminates this cost.}
 \label{fig:pareto}
 \end{figure}
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.6\textwidth]{paper/figures/brace_accuracy_vs_budget.png}
-\caption{BRACE-CPU accuracy versus intervention budget (corrected results), with 95\% CI over 5 seeds.}
+\caption{BRACE-CPU accuracy versus intervention budget for both two-pass (G\_TWOPASS) and single-pass online (G\_ONLINE) variants, with 95\% CI over 5 seeds.}
 \label{fig:brace-budget}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.6\textwidth]{paper/figures/budget_compliance.png}
+\caption{Budget compliance: actual intervention fraction versus nominal budget. G enforces its budget exactly (on the diagonal), whereas threshold policies (C, E, F) overshoot substantially under error accumulation.}
+\label{fig:budget-compliance}
 \end{figure}
 
 \bibliographystyle{plainnat}

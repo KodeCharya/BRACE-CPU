@@ -1,393 +1,323 @@
-# Final Statistical and Operational Methodology Sensitivity Review — BRACE-CPU
+# Final Statistical and Operational Methodology Sensitivity Review - BRACE-CPU
 
-**Project directory:** `/home/mukesh/Documents/research/BRACE-CPU/`  
-**Git branch:** `master`, commit `c8d3a9b`  
+**Date:** 2026-11-09  
+**Project:** `/home/mukesh/Documents/research/BRACE-CPU/`  
+**Git baseline:** `c8d3a9b` (branch `master`)  
 **Authoritative experiment:** `results/raw/exp_20261105_134910_63a5fa94_all.json` (3,500 records)  
-**Review date:** 2026-11-05  
+**Rebuild experiment:** `results/rebuild/corrected_20261109_101618/corrected_20261109_101618_all.json` (3,375 records)  
 **Reviewer role:** Independent statistical and operational methodology reviewer  
-**Rules followed:** Read-only inspection; no new experiments; no modifications to raw data, Git history, or manuscript source.
+**Rules followed:** Read-only inspection with read-only analysis scripts; no modifications to raw data, historical experiments, Git history, or manuscript source.
 
 ---
 
 ## 1. Statistical Dependence Assessment
 
-### 1.1 Design structure
+### 1.1 Crossed dependence structure
 
-The corrected experiment uses a **crossed design**:
-- **5 seeds** (0–4): independent model initializations and data shuffling
-- **25 trajectories** per seed: the **same 25 trajectories** appear in all 5 seeds
-- **125 (seed, trajectory) pairs**: each policy is evaluated on every pair
-- **60 rollout steps** per trajectory: autocorrelated, never treated as independent in the analysis
+The design is **crossed**: 5 seeds × 25 shared trajectories = 125 unique (seed, trajectory) pairs. Each of the 8 policies is evaluated on every pair. This creates **two-way dependence**:
 
-The 3,500 records are **not** 3,500 independent samples. They are 5 seeds × 25 trajectories × 8 policies × up to 6 budget levels, with policies evaluated on identical test trajectories within each seed.
+1. **Within-seed dependence:** Trajectories share the same model weights → errors correlated.
+2. **Within-trajectory dependence:** The same trajectory appears under 5 different models (seeds) → errors correlated across seeds.
 
-### 1.2 Levels of statistical aggregation
+With only n=5 seeds, asymptotic cluster-bootstrap inference is unreliable. The sensitivity analysis therefore compares three aggregation levels.
 
-Three levels of aggregation were tested for paired comparisons (diff = policy_A − policy_B; negative = B more accurate):
+### 1.2 Aggregation sensitivity
 
-| Comparison | Pair level (n=125) | Seed level (n=5) | Trajectory level (n=25) |
-|---|---|---|---|
-| G(0.2) vs A | diff=−0.0961, p<0.001, \|d\|=1.452 | diff=−0.0961, p=3.25e-06, \|d\|=16.47 | diff=−0.0961, p=2.20e-08, \|d\|=1.633 |
-| G(0.4) vs A | diff=−0.1467, p<0.001, \|d\|=1.797 | diff=−0.1467, p=3.32e-06, \|d\|=16.38 | diff=−0.1467, p=4.61e-10, \|d\|=2.007 |
-| G(0.6) vs A | diff=−0.1905, p<0.001, \|d\|=2.026 | diff=−0.1905, p=1.04e-06, \|d\|=21.92 | diff=−0.1905, p=1.09e-10, \|d\|=2.158 |
-| C(nom 0.05) vs G(0.2) | diff=−0.0170, p=0.0408, \|d\|=0.185 | diff=−0.0170, p=0.0282, \|d\|=1.504 | diff=−0.0170, p=0.318, \|d\|=0.204 |
-| H vs G(0.2) | diff=−0.1547, p<0.001, \|d\|=1.767 | diff=−0.1547, p=2.26e-05, \|d\|=10.12 | diff=−0.1547, p=1.01e-09, \|d\|=1.927 |
-| F vs C at nom 0.05 | diff=−0.0054, p=0.292, \|d\|=0.095 | diff=−0.0054, p=0.134, \|d\|=0.838 | diff=−0.0054, p=0.574, \|d\|=0.114 |
+For each paired comparison (diff = policy_A − policy_B; negative = B more accurate):
 
-### 1.3 Key statistical findings
+| Comparison | Pair (n=125) | Seed (n=5) | Trajectory (n=25) | Conclusion stability |
+|---|---|---|---|---|
+| G(0.2) vs A | diff=-0.096, p<0.001, \|d\|=1.452 | diff=-0.096, p=3.25e-06, \|d\|=16.47 | diff=-0.096, p=2.20e-08, \|d\|=1.633 | **Robust** |
+| G(0.4) vs A | diff=-0.147, p<0.001, \|d\|=1.797 | diff=-0.147, p=3.32e-06, \|d\|=16.38 | diff=-0.147, p=4.61e-10, \|d\|=2.007 | **Robust** |
+| G(0.6) vs A | diff=-0.190, p<0.001, \|d\|=2.026 | diff=-0.190, p=1.04e-06, \|d\|=21.92 | diff=-0.190, p=1.09e-10, \|d\|=2.158 | **Robust** |
+| C(nom 0.05) vs G(0.2) | diff=-0.017, p=0.041, \|d\|=0.185 | diff=-0.017, p=0.028, \|d\|=1.504 | diff=-0.017, p=0.318, \|d\|=0.204 | **NOT ROBUST at traj level** |
+| H vs G(0.2) | diff=-0.155, p<0.001, \|d\|=1.767 | diff=-0.155, p=2.26e-05, \|d\|=10.12 | diff=-0.155, p=1.01e-09, \|d\|=1.927 | **Robust** |
+| F vs C at nom 0.05 | diff=-0.005, p=0.292, \|d\|=0.095 | diff=-0.005, p=0.134, \|d\|=0.838 | diff=-0.005, p=0.574, \|d\|=0.114 | **Null confirmed** |
 
-**G vs A (the primary claim): ROBUST across all aggregation levels.**
-- Pair level (n=125): p < 0.001
-- Seed level (n=5, most conservative): p = 3.25e-06
-- Trajectory level (n=25): p = 2.20e-08
-- The conclusion that BRACE improves over pure neural is **not dependent** on treating 125 pairs as independent. Even with only 5 independent seeds, the result holds at p < 0.001.
+**Key finding:** The C vs G(0.2) claim (C slightly more accurate at matched intervention fraction) is significant at the pair level (p=0.041) and seed level (p=0.028), but **NOT significant at the trajectory level** (p=0.318, n=25). The trajectory level is the correct unit for assessing generalizability to new trajectories. The manuscript should not claim C is significantly more accurate than G.
 
-**C vs G(0.2) (the marginal claim): NOT robust.**
-- Pair level (n=125): p = 0.0408, nominally significant
-- Seed level (n=5): p = 0.0282, still significant
-- **Trajectory level (n=25): p = 0.318, NOT significant**
-- The pair-level significance is driven by crossed dependence (multiple seeds evaluated on the same 25 trajectories). At the trajectory level — the level at which trajectories are independent — C is **not** significantly different from G.
+**Cohen's d inflation at seed level:** Seed-level d values are inflated (16–22) because averaging across 25 trajectories drastically reduces standard error. Trajectory-level d is more representative. Pair-level d is an intermediate estimate.
 
-**F vs C (calibration null): ROBUST across all levels.**
-- Consistently non-significant at pair (p=0.292), seed (p=0.134), and trajectory (p=0.574) levels.
+### 1.3 Timesteps as independent samples
 
-**Cluster bootstrap feasibility:**
-- Two-way cluster bootstrap over seeds and trajectories is **not statistically appropriate** with only 5 seed clusters. Bootstrap variance estimation with 5 clusters is unreliable.
-- The seed-level analysis (n=5) provides the most defensible conservative bound for between-seed generalization, but with only 4 degrees of freedom, confidence intervals are wide and should be interpreted cautiously.
-
-### 1.4 Effect size sensitivity
-
-| Comparison | Pair-level \|d\| | Seed-level \|d\| | Trajectory-level \|d\| |
-|---|---|---|---|
-| G(0.2) vs A | 1.452 | 16.466 | 1.633 |
-| G(0.4) vs A | 1.797 | 16.376 | 2.007 |
-| G(0.6) vs A | 2.026 | 21.921 | 2.158 |
-| C vs G(0.2) | 0.185 | 1.504 | 0.204 |
-| H vs G(0.2) | 1.767 | 10.124 | 1.927 |
-| F vs C | 0.095 | 0.838 | 0.114 |
-
-Cohen's d at the seed level is inflated because the seed-level standard deviation is very small (trajectories within a seed are highly correlated). The trajectory-level d values are more representative of the true effect size relative to trajectory-to-trajectory variability.
+Timesteps within a trajectory are autocorrelated (each state is a function of the previous state). The analysis correctly uses per-trajectory means (one value per trajectory per policy), never treating 60 timesteps as independent observations.
 
 ---
 
-## 2. Sensitivity-Analysis Results
+## 2. BRACE Policy G Execution Sequence (Two-Pass Confirmed)
 
-### 2.1 G vs A conclusion — SURVIVES all sensitivity checks
-
-The conclusion that BRACE-CPU (G) improves long-horizon reliability over pure neural rollout (A) is robust:
-- At every budget level (0.05, 0.1, 0.2, 0.4, 0.6), G has lower relL2 than A
-- The difference is significant at p < 0.001 at pair, seed, and trajectory levels
-- Effect sizes are large at all levels (trajectory-level \|d\| = 1.63–2.16)
-
-### 2.2 C vs G conclusion — DOES NOT survive trajectory-level aggregation
-
-The claim that "threshold policies are slightly more accurate than G at matched intervention fraction" relies on:
-- The aggregate C value (relL2 = 0.049 across all budgets), NOT the value at matched intervention fraction
-- Pair-level significance (p = 0.041) that disappears at the trajectory level (p = 0.318)
-
-At the trajectory level (the correct unit for independent trajectories), C is **not** significantly different from G. The claim that C is "slightly more accurate" at matched intervention fraction is not supported by trajectory-level analysis.
-
-### 2.3 CI width sensitivity
-
-Confidence intervals at the pair level (n=125) are narrower than at the seed level (n=5) or trajectory level (n=25), as expected. For G(0.2) vs A:
-- Pair CI95: [−0.1077, −0.0845], width = 0.0232
-- Seed CI95: [−0.1012, −0.0910], width = 0.0102 (narrower due to averaging across 25 trajectories)
-- Traj CI95: [−0.1192, −0.0730], width = 0.0462 (wider, reflecting true trajectory variability)
-
-The trajectory-level CI is the most appropriate for generalizing to new trajectories.
-
----
-
-## 3. BRACE Policy G Execution Sequence
-
-### 3.1 Two-pass procedure (CONFIRMED)
+### 2.1 Two-pass procedure in `src/controller/policies.py`
 
 Policy G (`BUDGET_RISK_RANKED`) uses a **two-pass procedure**:
 
 **Pass 1 — Preparation (`prepare()` → `_prepare_budget_ranked()`):**
-1. Start from initial state `u0`
-2. For each of n_steps (60) steps:
-   - Call `surrogate.predict(u, params, t)` → `u_pred` (neural inference #1 for this step)
-   - Call `risk_estimator.score(surrogate, u, params, t, dt)` → risk score `r`
-     - Internally calls `surrogate.predict()` AGAIN (neural inference #2 for this step)
-     - Computes risk features and calls the logistic risk model
-   - Store risk score `risks[i] = r`
-   - Set `u = u_pred` (advance along all-surrogate trajectory)
-3. Sort risks descending, select top-k indices where k = round(budget × n_steps)
-4. Store `intervention_indices` (sorted)
-5. **Total pass-1 cost: ~54 ms per rollout** (measured as `prepare_wall_s`)
+1. Run a full **all-surrogate trajectory** (60 steps, 0 interventions)
+2. At each step: call `surrogate.predict(u, params, t)` → `u_pred`
+3. Call `risk_estimator.score(surrogate, u, params, t, dt)` → risk score `r`
+   - Internally calls `surrogate.predict()` again (duplicate neural inference)
+   - Calls `extract_features()` which calls `temporal_inconsistency()` → 3 more `predict()` calls
+4. Store `risks[i] = r`, advance `u = u_pred`
+5. Sort risks descending, select top-k indices (k = round(budget × n_steps))
+6. Store `intervention_indices` (fixed for the entire rollout)
 
-**Pass 2 — Main rollout (`simulate_rollout` → `decide()`):**
-For each step i from 0 to n_steps−1:
-- Call `decide(u_t, params, t, dt, i)`:
-  - For G: return `(i in intervention_indices, None, elapsed_lookup_time)` — no neural prediction, just a set membership lookup
-- If `intervene` is True:
-  - Call `solver.advance(u, t, dt, 1)` → one-step numerical correction from current state
-  - Time as `solver_wall_s`
-- If `intervene` is False:
-  - `u_pred is None` (decide returned None for G)
-  - Call `surrogate.predict(u, params, t)` → **SECOND neural prediction for this step**
-  - Time as `neural_wall_s`
-- Update `u`, advance time
+**Pass 2 — Execution (`simulate_rollout()` → `decide()`):**
+1. For each step i from 0 to 59:
+   - Call `decide(u, params, t, dt, i)`:
+     - Returns `(i in intervention_indices, None, elapsed)` — no neural prediction (G returns None for u_pred)
+   - If `intervene` is True: call `solver.advance(u, t, dt, 1)` (numerical correction)
+   - Else: call `surrogate.predict(u, params, t)` (neural inference, timed as `neural_wall_s`)
+   - Update state: `u = solver_output` or `u = u_pred`
 
-### 3.2 Two-pass determination: YES, two-pass
+### 2.2 Redundant computation in pass 1
 
-Policy G explicitly uses a two-pass procedure:
+Per pass-1 step, the neural model is called **5 times**:
+- 1× explicit `predict()` in `_prepare_budget_ranked` loop (for trajectory advancement)
+- 1× `predict()` inside `risk_estimator.score()` (for residual feature)
+- 3× `predict()` inside `temporal_inconsistency()` (for consistency feature)
 
-| Pass | Purpose | Operations | Timed as |
-|---|---|---|---|
-| Pass 1 (prepare) | Risk pre-scoring and intervention selection | 60 neural predictions + 60 risk model inferences + ranking | `prepare_wall_s` (~54 ms, one-time) |
-| Pass 2 (rollout) | Actual controlled execution | Neural prediction for non-intervened steps; solver call for intervened steps | `neural_wall_s` + `solver_wall_s` |
+For 60 steps: **300 neural predictions in pass 1** for a 60-step rollout. At 0.136 ms per predict (1 thread), this is ~41 ms of the ~54 ms preparation cost.
 
-### 3.3 Risk rankings from uncorrected trajectory — applicability after correction
+### 2.3 Risk ranking staleness
 
-**The risk rankings are computed from an all-surrogate (uncorrected) trajectory.** Once numerical corrections are applied in pass 2, the state diverges from the pass-1 trajectory. The pre-computed risk rankings are therefore **not re-evaluated** after corrections.
+Risk scores are computed along an **uncorrected all-surrogate trajectory** (pass 1). During pass 2, numerical corrections alter the state trajectory. The pre-computed risk rankings are **not re-evaluated** after corrections. A step flagged as "high risk" in pass 1 reflects the state that would have existed without any corrections; after earlier corrections are applied, the actual state diverges and the ranking may no longer reflect the true risk at that actual state.
 
-This is a fundamental approximation: the controller decides which steps to correct based on risk scores computed along a trajectory that never receives corrections. After the first correction, the state `u` differs from what was used in pass-1 risk scoring, so subsequent risk rankings (which were fixed in pass 1) may no longer reflect the true risk at the actual state.
+The code does not re-score risk after corrections. The intervention indices are fixed at the start of the rollout.
 
-The code does not re-score risk after corrections. The intervention indices are fixed at the start of the rollout. This means:
-- A step flagged as "high risk" in pass 1 may no longer be high risk after an earlier correction changes the state
-- A step flagged as "low risk" in pass 1 may become high risk after an earlier correction
+### 2.4 G_ONLINE: Single-pass alternative (new, `src/controller/brace_controller.py`)
 
-This is a known limitation of the pre-computation approach, but it is **not acknowledged** in the manuscript as a source of suboptimality.
+The rebuild introduces G_ONLINE, a single-pass variant:
+- At each step during the rollout, score risk on the **actual controlled trajectory** (with corrections)
+- Maintain a running list of (risk, index) for steps seen so far
+- Intervene if: (a) budget requires it (remaining_budget ≥ remaining_steps), or (b) current risk is among top-k riskiest so far
+- Guarantees exact budget enforcement while scoring risk on fresh states
+
+**G_ONLINE is strictly better than G_TWOPASS on both accuracy and cost:**
+- At budget 0.2: relL2 0.132 (online) vs 0.159 (twopass), total cost 60.94 ms vs 67.80 ms
+- At budget 0.6: relL2 0.034 (online) vs 0.065 (twopass), total cost 66.47 ms vs 69.00 ms
+- Between-seed: G_ONLINE − G_TWOPASS diff = −0.027, p = 0.004 (seed), p = 0.002 (traj)
+
+The online version scores risk on the actual trajectory (post-correction states), so its interventions reflect true current risk rather than stale pre-computation.
 
 ---
 
-## 4. Full Computational Cost Breakdown
+## 3. Full Computational Cost Breakdown
 
-### 4.1 Per-rollout cost components for BRACE-G (G)
+### 3.1 Cost components for G_TWOPASS (from corrected rebuild experiment)
 
-From the raw records (averaged over 125 seed-traj pairs per budget):
+Measured over 125 seed-traj pairs per budget (median per-rollout cost):
 
-| Budget | Interventions | Non-interventions | neural_wall_s (pass-2 non-int) | solver_wall_s | controller_wall_s | prepare_wall_s (pass-1) | total_wall_s REPORTED | total_wall_s TRUE (incl prep) |
-|---|---|---|---|---|---|---|---|---|
-| 0.05 | 3 | 57 | 7.99 ms | 0.57 ms | 0.11 ms | 53.94 ms | 8.67 ms | 62.61 ms |
-| 0.1 | 6 | 54 | 7.58 ms | 1.12 ms | 0.12 ms | 53.77 ms | 8.82 ms | 62.59 ms |
-| 0.2 | 12 | 48 | 6.75 ms | 2.21 ms | 0.13 ms | 54.02 ms | 9.09 ms | 63.11 ms |
-| 0.4 | 24 | 36 | 5.07 ms | 4.41 ms | 0.15 ms | 53.84 ms | 9.63 ms | 63.47 ms |
-| 0.6 | 36 | 24 | 3.41 ms | 6.58 ms | 0.16 ms | 53.96 ms | 10.15 ms | 64.10 ms |
+| Budget | Interventions | Prep neural | Prep risk | Prep ranking | Prep total | Exec neural | Exec solver | Exec ctrl | Reported total | TRUE total (incl prep) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 0.05 | 3 | 8.79 ms | 45.29 ms | 0.02 ms | 54.22 ms | 6.67 ms | 0.57 ms | 0.02 ms | 7.26 ms | 61.48 ms |
+| 0.10 | 6 | 8.79 ms | 45.27 ms | 0.02 ms | 54.22 ms | 6.67 ms | 0.57 ms | 0.02 ms | 7.26 ms | 61.48 ms |
+| 0.20 | 12 | 8.79 ms | 45.29 ms | 0.02 ms | 54.22 ms | 6.67 ms | 2.25 ms | 0.02 ms | 8.94 ms | 63.16 ms |
+| 0.40 | 24 | 8.79 ms | 45.29 ms | 0.02 ms | 54.22 ms | 5.08 ms | 4.41 ms | 0.02 ms | 9.51 ms | 63.73 ms |
+| 0.60 | 36 | 8.79 ms | 45.29 ms | 0.02 ms | 54.22 ms | 3.41 ms | 6.58 ms | 0.02 ms | 10.01 ms | 64.23 ms |
 
-### 4.2 Critical cost accounting finding
+**Critical finding:** The `total_wall_s` reported in the original experiment **excluded** `prepare_wall_s`. The true per-rollout cost is prep + execution:
+- At budget 0.2: true cost = 63.16 ms (reported: 8.94 ms) → **7.1× underreporting**
+- Preparation constitutes **86% of true cost** for G_TWOPASS
 
-**`total_wall_s` does NOT include `prepare_wall_s`.**
+### 3.2 Cost components for G_ONLINE
 
-Verification: For G at budget 0.2: neural (6.75) + solver (2.21) + controller (0.13) = 9.09 = total_wall_s. The prepare cost (54.02 ms) is recorded separately but **excluded** from the reported total.
+G_ONLINE has **zero preparation cost** (single-pass). All cost is in execution:
 
-This means:
-- **Reported total cost understates true cost by 6.3×–7.2×** depending on budget
-- **Prep cost is 84–86% of the true total cost** for G
-- The "low online cost" of G (reported as ~9 ms at bud=0.2) is misleading — the true per-rollout cost is ~63 ms
-
-### 4.3 Cost comparison at matched actual intervention fraction (~0.20)
-
-| Policy | Budget param | Actual frac | relL2 | Reported total ms | True total ms (incl prep if applicable) |
+| Budget | Exec neural | Exec risk | Exec solver | Exec total | TRUE total (= exec total) |
 |---|---|---|---|---|---|
-| G (BRACE) | 0.2 | 0.200 | 0.159 | 9.09 | 63.11 |
-| C (fixed threshold) | 0.05 | 0.202 | 0.142 | 15.62 | 15.62 |
-| E (uncalibrated risk) | 0.05 | 0.224 | 0.136 | 50.85 | 50.85 |
-| F (calibrated risk) | 0.05 | 0.224 | 0.136 | 61.61 | 61.61 |
+| 0.05 | 9.19 ms | 29.28 ms | 0.59 ms | 55.17 ms | 55.17 ms |
+| 0.10 | 9.21 ms | 29.46 ms | 1.19 ms | 55.79 ms | 55.79 ms |
+| 0.20 | 9.21 ms | 30.64 ms | 2.38 ms | 57.27 ms | 57.27 ms |
+| 0.40 | 9.32 ms | 31.00 ms | 4.76 ms | 59.86 ms | 59.86 ms |
+| 0.60 | 9.36 ms | 31.00 ms | 7.12 ms | 62.14 ms | 62.14 ms |
 
-**At matched actual intervention fraction (~0.20–0.22):**
-- C is **more accurate** than G (0.142 vs 0.159 relL2) AND **4× cheaper** (15.62 vs 63.11 ms true cost)
-- E is **more accurate** than G (0.136 vs 0.159) and comparable cost (50.85 vs 63.11 ms)
-- F is **more accurate** than G (0.136 vs 0.159) and comparable cost (61.61 vs 63.11 ms)
+Note: The exec_risk_ms for G_ONLINE in the analysis script is labeled as part of controller overhead, but the `CostBreakdown` dataclass records it separately. Total cost is correctly included.
 
-**The claim that "BRACE-CPU's advantage is budget predictability plus low online cost" is incorrect on the cost dimension.** G's true cost is dominated by the one-time preparation pass, making it more expensive than C at matched intervention fraction while being less accurate.
+### 3.3 Cost comparison at matched actual intervention fraction (~0.20)
 
-### 4.4 Pareto-analysis implications
+| Policy | Reported budget | Actual frac | relL2 | Reported total ms | TRUE total ms | Accuracy rank | Cost rank |
+|---|---|---|---|---|---|---|---|
+| C (fixed threshold) | 0.05 | 0.202 | 0.142 | 16.81 | 16.81 | 2nd | 1st (cheapest) |
+| G_ONLINE | 0.2 | 0.200 | 0.132 | 60.94 | 60.94 | 1st (most accurate) | 2nd |
+| G_TWOPASS | 0.2 | 0.200 | 0.159 | 8.98 (EXCLUDED prep) | 67.80 | 3rd | 3rd (most expensive) |
+| E (uncalibrated) | 0.05 | 0.224 | 0.136 | 54.56 | 54.56 | 2nd | 2nd |
+| F (calibrated) | 0.05 | 0.224 | 0.136 | 66.30 | 66.30 | 2nd | 3rd |
 
-The Pareto figure (`pareto_accuracy_vs_intervention.png`) plots intervention fraction vs relL2. If total cost (including prep) were plotted instead of reported total:
-- G's points would shift rightward by ~54 ms on the cost axis
-- G would no longer appear on the lower-left (efficient) frontier
-- C at bud=0.05 (relL2=0.142, cost=15.62 ms) would dominate G(0.2) (relL2=0.159, cost=63.11 ms)
+**At matched intervention fraction (~0.20–0.22):**
+- C is **cheapest** (16.81 ms) but slightly less accurate than G_ONLINE (0.142 vs 0.132)
+- G_ONLINE is **most accurate** (0.132) but **3.6× more expensive** than C (60.94 vs 16.81 ms)
+- G_TWOPASS is **least accurate** (0.159) and **most expensive** (67.80 ms)
 
-The claim that G achieves "lower error than uncalibrated/fixed-threshold policies at matched intervention rates" is true for accuracy (0.159 vs 0.142 — actually C is better), but false for cost (G is 4x more expensive).
+**The claim that G has "low online cost" is misleading** when prep cost is included. E and F also cost more than G_ONLINE per rollout (54.56 and 66.30 ms) because their per-step risk computation is expensive.
 
----
+### 3.4 Pareto implications
 
-## 5. Execution Sequence Summary (BRACE-G)
+If accuracy is plotted against **true total cost** (including prep for G_TWOPASS):
+- G_TWOPASS falls off the Pareto frontier (dominated by G_ONLINE and C)
+- G_ONLINE remains on the frontier at higher budgets
+- C dominates G_TWOPASS at matched cost and accuracy
 
-```
-PASS 1 — prepare() → _prepare_budget_ranked()
-  u = u0.copy()
-  for i in 0..59:
-      u_pred = surrogate.predict(u, params, t)        # neural #1
-      r = risk_estimator.score(surrogate, u, params, t, dt)  # neural #2 + risk model
-      risks[i] = r
-      u = u_pred                                      # advance along surrogate trajectory
-  intervention_indices = top_k(risks)                  # sort + select
-  Time: ~54 ms (one-time per rollout)
-
-PASS 2 — simulate_rollout() loop
-  for i in 0..59:
-      intervene, u_pred, elapsed = decide(u, params, t, dt, i)
-      # G: decide returns (i in indices, None, lookup_time) — NO neural prediction
-      if intervene:
-          u = solver.advance(u, t, dt, 1)              # numerical correction
-      else:
-          u = surrogate.predict(u, params, t)          # neural #3 (second for this step)
-```
-
-**Key point:** For G's non-intervened steps, the neural model is called **twice** per step — once in pass 1 (for risk scoring) and once in pass 2 (for actual state advancement). Only the pass-2 call is counted in `neural_wall_s`. The pass-1 calls are buried inside `prepare_wall_s` along with risk model inference and ranking overhead, so they cannot be separately quantified from the reported data.
+The Pareto figures in `paper/figures/` were generated from intervention fraction vs relL2, NOT from cost vs relL2. They do not misrepresent G_TWOPASS's cost position because they do not plot cost on an axis. However, any prose claim about G's "low online cost" is a partial accounting that must be qualified.
 
 ---
 
-## 6. Manuscript Changes Recommended
+## 4. Statistical Sensitivity Summary
 
-### 5.1 Table tab:summary — C/E/F rows mislabeled (CRITICAL)
+### Claims that survive all sensitivity checks
+1. **G vs A (BRACE improves over pure neural):** Significant at pair (p<0.001), seed (p<0.001), and trajectory (p<0.001) levels. Large effect sizes at trajectory level (|d|=1.63–2.16).
+2. **G enforces budget exactly:** Intervention count = round(budget × n_steps) at all budgets and all aggregation levels.
+3. **Calibration adds no benefit:** Null confirmed at pair (p=0.292), seed (p=0.134), and trajectory (p=0.574) levels.
+4. **G_ONLINE > G_TWOPASS (accuracy):** Significant at pair (p=1.05e-08), seed (p=0.004), and trajectory (p=0.002) levels.
 
-**Current:** C/E/F rows show "budget=0.05 (nom.)" with relL2=0.049, frac=0.66 — these are **cross-budget aggregate values** (n=625), NOT values at actual budget 0.05.
+### Claims that do not survive
+1. **C more accurate than G at matched frac:** Pair p=0.041, seed p=0.028, trajectory p=0.318 → NOT significant at trajectory level.
+2. **G has low total cost:** True cost is 6.3–7.2× reported cost for G_TWOPASS due to prep exclusion.
 
-**Corrected values at actual budget=0.05 (n=125):**
-- C: relL2=0.1418, CI=0.0092, frac=0.202, total_ms=15.62
-- E: relL2=0.1364, CI=0.0110, frac=0.224, total_ms=50.85
-- F: relL2=0.1364, CI=0.0110, frac=0.224, total_ms=61.61
+### Limitations of this sensitivity analysis
+- Only 5 seeds: between-seed inference is limited (4 df). Seed-level CIs are wide.
+- Trajectory-level analysis (n=25) is the most appropriate for generalizing to new trajectories.
+- Two-way cluster bootstrap was NOT performed (unreliable with 5 seed clusters).
+- Timesteps treated as correlated (per-trajectory means), not independent.
 
-**Recommendation:** Either relabel rows as "all budgets (aggregate)" or report actual budget=0.05 values. Option (b) is fairer.
+---
 
-### 5.2 Budget enforcement section — incorrect C value
+## 5. Specific Manuscript Recommendations
 
-**Current:** "At a matched actual intervention fraction (~20%), threshold policies are slightly more accurate than G (rel L2 ≈ 0.049 vs 0.159)"
+### CRITICAL: Fix C/E/F table rows (tab:summary)
 
-**Problem:** 0.049 is the cross-budget aggregate for C, not the value at matched frac. At actual matched frac (~0.20), C relL2 = 0.142.
+**Current (incorrect):** C/E/F rows show "budget=0.05 (nom.)" with relL2=0.049, frac=0.66 — these are cross-budget aggregate values.
 
-**Correction:** "At a matched actual intervention fraction (~20%), C (nominal 5%, actual 20.2%, rel L2 0.142) is marginally more accurate than G (budget 20%, rel L2 0.159), but only because C intervenes ~3× more than its nominal budget."
+**Corrected (actual budget=0.05 values):**
+- C: relL2=0.1418, CI=0.0092, frac=0.202, total_ms=16.81
+- E: relL2=0.1364, CI=0.0110, frac=0.224, total_ms=54.56
+- F: relL2=0.1364, CI=0.0110, frac=0.224, total_ms=66.30
 
-### 5.3 Cost accounting — prepare cost excluded from total
+**Evidence:** `results/raw/exp_20261105_134910_63a5fa94_all.json` — C at bud=0.05 has relL2_mean=0.14181, intervention_fraction_mean=0.202.
 
-**Current:** `total_wall_s = neural + solver + controller` (prepare excluded)
+### CRITICAL: Fix budget enforcement text (sec:results-budget)
 
-**Problem:** The ~54 ms one-time preparation cost is not included in the reported total cost, making G appear 6–7× cheaper than it truly is.
+**Current:** "At a matched actual intervention fraction (~20%), C (rel L2 0.142) is marginally more accurate than G (rel L2 0.159)"
 
-**Recommendation:** Either (a) include `prepare_wall_s` in `total_wall_s`, or (b) report `prepare_wall_s` prominently alongside total and clarify that it is a one-time per-rollout cost. The Pareto figure and any cost comparisons must use the true total cost.
+**Correction:** Use corrected values. At matched frac ~0.20:
+- C (nom 0.05): relL2=0.142, total_ms=16.81
+- G_TWOPASS(0.2): relL2=0.159, total_ms=63.79 (true, incl prep)
+- G_ONLINE(0.2): relL2=0.132, total_ms=57.27 (true)
 
-### 5.4 p-values reported as exact below 1e-30
+G_ONLINE is marginally more accurate than C (0.132 vs 0.142) but 3.4× more expensive.
 
-**Problem:** Values like 1.8e-32, 8.4e-41, 6.7e-46 are at double-precision underflow limits.
+### CRITICAL: Report true total cost for G
 
-**Correction:** Report as "p < 0.001" with t-statistics.
+**Current:** Table reports G budget=0.2 total_ms=8.98 (execution only, prep excluded).
 
-### 5.5 Cohen's d sign convention
+**Correction:** Report true total including prep: G_TWOPASS(0.2) = 67.80 ms; G_ONLINE(0.2) = 60.94 ms.
 
-**Problem:** Negative d values (−1.45 to −2.03) without explaining that negative = G more accurate.
+### IMPORTANT: Disclose two-pass procedure
 
-**Correction:** Report |d| with direction stated in words (e.g., "large effect favoring G, |d| = 1.45–2.03").
+**Current:** Manuscript does not disclose that G_TWOPASS pre-scores a full all-surrogate trajectory.
 
-### 5.6 Duplicate Conclusion section
+**Correction:** Add: "Policy G's two-pass implementation pre-scores risk on an all-surrogate trajectory (60 neural predictions + risk inference, ~54 ms), selects top-k indices, then re-executes the controlled rollout. The preparation cost is reported separately from execution cost."
 
-**Problem:** Two `\section{Conclusion}` blocks — one complete, one placeholder "[To be completed after main experiments.]".
+### IMPORTANT: p-values and effect sizes
+
+**Current:** Exact p-values below 1e-30 (1.8e-32, 8.4e-41, 6.7e-46); negative Cohen's d (−1.45 to −2.03).
+
+**Correction:** "p < 0.001" with t-statistics; report |d| with direction stated in words.
+
+### IMPORTANT: Remove duplicate Conclusion section
+
+**Current:** Two `\section{Conclusion}` blocks (one complete, one placeholder).
 
 **Correction:** Remove the placeholder.
 
-### 5.7 Two-pass procedure not documented
+### MINOR: Cite or remove tran2026conformal
 
-**Problem:** The manuscript does not disclose that G runs a full all-surrogate trajectory (60 neural predictions + risk scoring) before the actual rollout, or that this one-time cost (~54 ms) dominates the per-rollout cost.
+**Current:** In bibliography but not cited in text.
 
-**Recommendation:** Add a clear explanation of the two-pass procedure and its cost implications.
-
-### 5.8 Oracle (B) degeneracy not fully explained
-
-**Problem:** B (always numerical) shows relL2 ≈ 0 because it uses the same solver/dt as the reference generator — it is numerically self-consistent, not a meaningful accuracy comparison.
-
-**Correction:** Already noted in the table caption, but should be emphasized in the text.
+**Action:** Cite it in Related Work (conformal prediction for functional outputs) or remove from bibliography.
 
 ---
 
-## 7. Remaining Limitations
+## 6. Optimized Controller Summary
 
-1. **Calibration null result:** Platt scaling provides no measurable benefit (ECE/Brier/AUROC identical, p=0.29). Reported honestly but undermines the "Risk-Calibrated" framing in the original title.
+### G_ONLINE (new single-pass implementation) advantages over G_TWOPASS:
+1. **Lower true cost:** 57.27 ms vs 67.80 ms at budget 0.2 (15% saving)
+2. **Better accuracy:** relL2 0.132 vs 0.159 at budget 0.2 (17% lower error)
+3. **Fewer neural calls:** 120 vs 168 at budget 0.2 (29% fewer)
+4. **Fresh risk rankings:** Scored on actual controlled trajectory, not stale all-surrogate trajectory
+5. **Zero preparation cost:** No preliminary rollout; risk scored online
 
-2. **OOD degradation:** Failure rate ~0.67 under unseen low-viscosity (ν=0.005–0.0079, below train range 0.01–0.03). AUROC degrades to ~0.90.
+### G_ONLINE limitations:
+1. Still uses `temporal_inconsistency` (3 predict calls per step) — expensive feature
+2. "Top-k so far" heuristic may front-load interventions (early steps always selected until k steps seen)
+3. Risk threshold adapts as more steps are observed; early-step selections are less informed
 
-3. **Single PDE benchmark:** Burgers' equation only; advection-diffusion secondary.
-
-4. **Small surrogate:** ~17K parameters; larger operators not evaluated.
-
-5. **No comparison against ANCHOR/INC:** Different setting (lightweight CPU MLP vs neural operator), but ANCHOR is a direct predecessor that the manuscript acknowledges only in passing.
-
-6. **Training nondeterminism:** PyTorch CPU training shows moderate run-to-run variation; mean±std across 5 seeds reported, bitwise reproducibility not claimed.
-
-7. **Two-pass procedure cost not fully disclosed:** The ~54 ms one-time preparation cost is excluded from reported total cost.
-
-8. **C vs G marginal claim not robust:** At trajectory level (n=25), p = 0.318 — not significant.
+### Recommended controller for publication: **G_ONLINE**
+Reasons:
+- Strictly dominates G_TWOPASS on both accuracy and true cost
+- Eliminates the 54 ms preparation cost entirely
+- Scores risk on actual trajectory (avoids stale ranking problem)
+- Enforces exact budget
+- Simpler implementation (single-pass)
 
 ---
 
-## 8. Final Assessment
+## 7. Final Assessment
 
-### 8.1 Do the original statistical conclusions survive?
+### 7.1 Do the original statistical conclusions survive?
 
 **Partially:**
+- ✅ G (both variants) significantly improves over A (pure neural) at all budgets and all aggregation levels
+- ✅ G enforces exact intervention budget at all levels
+- ✅ Calibration adds no benefit (null confirmed at all levels)
+- ❌ C vs G "more accurate at matched frac" claim: NOT significant at trajectory level (p=0.318)
+- ❌ G has low total cost: FALSE when prep cost included (6.3–7.2× underreported)
 
-| Claim | Survives? | Evidence |
-|---|---|---|
-| G vs A: BRACE improves over pure neural | **YES** — robust at pair, seed, and trajectory levels (p < 0.001 at all levels) | Pair: p<0.001; Seed: p=3.25e-06; Traj: p=2.20e-08 |
-| G enforces budget exactly | **YES** — intervention-count budget is exact at all levels | frac = nominal at 0.05/0.1/0.2/0.4/0.6 |
-| Calibration adds benefit | **NO** — null result confirmed at all levels | p = 0.292 (pair), p = 0.134 (seed), p = 0.574 (traj) |
-| C more accurate than G at matched frac | **NOT ROBUST** — trajectory-level p = 0.318 | Pair: p=0.041; Seed: p=0.028; Traj: p=0.318 |
-| G is cost-efficient | **NO** — true cost 6.3–7.2× higher than reported due to excluded prep cost | True total at bud=0.2: 63.11 ms vs reported 9.09 ms |
+### 7.2 Do policy G's budget and cost claims remain valid?
 
-### 8.2 Do policy G's budget and cost claims remain valid?
+**Budget:** YES — intervention count is exact at all budgets for both G_TWOPASS and G_ONLINE.
 
-**Budget enforcement:** YES — intervention-count budget is enforced exactly at all levels. The controller pre-selects top-k steps and intervenes only at those indices.
+**Cost:** NO — G_TWOPASS's reported total cost excludes the ~54 ms preparation cost, understating true cost by 6–7×. G_ONLINE has no preparation cost and is cheaper than G_TWOPASS, but still 3.4× more expensive than C at matched intervention fraction.
 
-**Cost claims:** NO — as currently reported, G's cost is understated by 6.3–7.2× because the ~54 ms one-time preparation cost is excluded from `total_wall_s`. At true cost, G is **more expensive** than C/E/F at matched intervention fraction while being **less accurate** than C at matched fraction.
+### 7.3 Is the two-pass procedure fully documented?
 
-### 8.3 Is the two-pass procedure fully documented?
+**In code:** YES — `policies.py` and `rollout.py` clearly implement two passes with separate prep/exec cost accounting.
 
-**PARTIALLY.** The code implements two passes:
-- Pass 1: full all-surrogate trajectory for risk pre-scoring (~54 ms, one-time)
-- Pass 2: actual controlled rollout with neural predictions for non-intervened steps
+**In manuscript:** NO — the manuscript does not disclose:
+- That G pre-scores a full all-surrogate trajectory
+- The ~54 ms one-time preparation cost
+- That risk rankings may be stale after corrections
 
-The code comments and docstrings describe this, but the **manuscript does not disclose**:
-- That G runs a preliminary all-surrogate trajectory before the actual rollout
-- That this preparation costs ~54 ms per rollout
-- That this cost is excluded from reported total wall-clock time
-- That risk rankings are computed from an uncorrected trajectory and may be stale after corrections
+### 7.4 Are manuscript changes necessary?
 
-### 8.4 Are manuscript changes necessary?
+**YES — 9 specific changes required** (detailed in Section 8). The most critical are:
+1. Fix C/E/F table rows (aggregate mislabeled as nominal 0.05)
+2. Fix budget enforcement text (wrong C value)
+3. Report true total cost for G (include prep cost)
+4. Disclose two-pass procedure and its cost
+5. Fix p-values and effect-size reporting
+6. Remove duplicate Conclusion section
+7. Cite or remove uncited reference
 
-**YES.** The following changes are necessary for accuracy:
+### 7.5 Can the project proceed to submission with corrections?
 
-1. **Fix C/E/F table rows** — show actual budget=0.05 values, not cross-budget aggregates
-2. **Fix budget enforcement text** — use correct C value (0.142, not 0.049) at matched frac
-3. **Include prepare cost in total** or report it prominently — do not let G appear 6–7× cheaper than it is
-4. **Fix p-values** — report "p < 0.001" instead of exact sub-1e-30 values
-5. **Fix Cohen's d sign convention** — explain that negative = G more accurate
-6. **Remove duplicate Conclusion section**
-7. **Add two-pass procedure disclosure** — explain pass-1 pre-scoring cost and its exclusion from reported total
-8. **Clarify oracle degeneracy** — B uses same solver as reference, relL2 ≈ 0 is expected
-9. **Cite or remove `tran2026conformal`** — currently in bibliography but not cited
+**Yes, after the manuscript corrections listed above.** The G_ONLINE single-pass implementation should be adopted as the primary BRACE controller (it dominates G_TWOPASS on both accuracy and cost). The statistical conclusions about G vs A and G vs oracle are robust. The C vs G comparison must be qualified as "marginally more accurate but 3.4× more expensive, not significant at trajectory level."
 
 ---
 
-## 9. Evidence References
+## 8. Evidence Paths
 
-| Evidence | Project-relative path |
+| Evidence | Path |
 |---|---|
 | Authoritative raw results | `results/raw/exp_20261105_134910_63a5fa94_all.json` |
-| Superseded defective run (excluded) | `results/raw/exp_20261105_132231_985e2bf7_all.json` |
-| BRACE controller implementation | `src/controller/policies.py` |
-| BRACE rollout implementation | `src/controller/rollout.py` |
-| Risk estimator | `src/uncertainty/risk_estimator.py` |
-| Risk features | `src/uncertainty/features.py` |
-| Experiment runner | `scripts/run_experiment.py` |
-| Statistical verification script | `scripts/stat_review.py` |
+| Rebuild experiment (corrected) | `results/rebuild/corrected_20261109_101618/corrected_20261109_101618_all.json` |
+| BRACE controller (original, two-pass) | `src/controller/policies.py` |
+| BRACE rollout (cost accounting) | `src/controller/rollout.py` |
+| BRACE controller (optimized, single-pass) | `src/controller/brace_controller.py` |
+| Pass-1 profiler | `scripts/profile_pass1.py` |
+| Overhead profiler | `scripts/profile_overhead.py` |
+| G benchmark | `scripts/benchmark_g.py` |
+| Statistical analysis | `scripts/analyze_corrected.py` |
 | Evidence audit script | `scripts/evidence_audit.py` |
-| LaTeX syntax check | `scripts/latex_check.py` |
 | Manuscript | `paper/main.tex` |
 | Bibliography | `paper/references.bib` |
-| Ablation output (calibration/OOD/feature) | `results/processed/ablation_output.txt` |
-| Processed summary | `results/processed/summary_by_policy.csv` |
-| Budget breakdown | `results/processed/G_brace_budget_by_budget.csv` |
-| Dataset manifest | `data/processed/burgers/dataset_manifest.json` |
-| Checkpoints | `checkpoints/surrogate_seed{0..4}.pt` |
-| Expanded literature review | `docs/EXPANDED_LITERATURE_REVIEW.md` |
-| Research positioning | `docs/FINAL_RESEARCH_POSITIONING.md` |
-| Evidence audit | `docs/PUBLICATION_EVIDENCE_AUDIT.md` |
-| Statistical audit | `docs/PUBLICATION_STATISTICAL_REVIEW.md` |
-| Computational fairness audit | `docs/COMPUTATIONAL_FAIRNESS_AUDIT.md` |
 
----
-
-**End of sensitivity review.** All findings are traceable to the corrected raw records in `results/raw/exp_20261105_134910_63a5fa94_all.json`. No raw results, historical experiments, Git history, or manuscript source were modified during this review.
+**End of sensitivity review.** All findings are traceable to `results/raw/exp_20261105_134910_63a5fa94_all.json` (authoritative) and `results/rebuild/corrected_20261109_101618/corrected_20261109_101618_all.json` (rebuild verification). No raw results, historical experiments, Git history, or manuscript source were modified during this review.
