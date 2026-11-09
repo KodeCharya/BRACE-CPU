@@ -26,6 +26,3 @@ estimates to selectively invoke numerical computation?
 ```
 PYTHONPATH=src .venv/bin/python -m pytest tests/ -v
 ```
-
-## License
-Private research.
