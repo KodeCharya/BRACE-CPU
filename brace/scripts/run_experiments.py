@@ -27,7 +27,7 @@ SCORE_KIND = {
     "ranked_residual": "residual",
     "ranked_ensemble": "ensemble",
     "ranked_calibrated": "calibrated",
-    "brace": "brace",
+    "brace": "horizon",
     "oracle": "oracle",
 }
 
@@ -93,6 +93,7 @@ def main() -> None:
     ap.add_argument("--cal-frac", type=float, default=0.5)
     ap.add_argument("--brace-mode", default="hybrid", choices=["hybrid", "expected", "prob"])
     ap.add_argument("--time-weight", default="none", choices=["none", "early", "late"])
+    ap.add_argument("--risk-target", default="step", choices=["step", "horizon"])
     ap.add_argument("--downsample-to", type=int, default=0)
     ap.add_argument("--tau-fail", type=float, default=0.05)
     ap.add_argument("--correction-mode", default="step")
@@ -125,14 +126,18 @@ def main() -> None:
     elif args.ablate == "residual_only":
         mask = np.zeros(9, dtype=bool); mask[2] = True
     risk = fit_risk_model(models, u_val, args.benchmark, p_val, dt, tau_fail=args.tau_fail,
-                          cal_frac=args.cal_frac, mask=mask)
+                          cal_frac=args.cal_frac, mask=mask, risk_target="step")
+    risk_hz = fit_risk_model(models, u_val, args.benchmark, p_val, dt, tau_fail=args.tau_fail,
+                             cal_frac=args.cal_frac, mask=mask, risk_target="horizon")
     risk_eval = evaluate_risk_on_split(models, u_test, args.benchmark, p_test, dt,
                                        risk["risk_model"], risk["conformal"],
-                                       tau_fail=args.tau_fail)
+                                       tau_fail=args.tau_fail, risk_target="step",
+                                       risk_hz=risk_hz["risk_model"], conf_hz=risk_hz["conformal"])
     base = {
         "benchmark": args.benchmark, "seed": args.seed, "split": args.split,
         "n_test": n, "dt_save": dt, "model": args.model, "members": len(models),
-        "risk_report": risk["report"], "risk_eval": risk_eval,
+        "risk_report": risk["report"], "risk_report_horizon": risk_hz["report"],
+        "risk_eval": risk_eval,
         "prep_seconds": time.time() - t0,
     }
     with open(f"{out_dir}/{args.benchmark}_{args.split}_s{args.seed}_risk.json", "w") as f:
@@ -191,10 +196,10 @@ def main() -> None:
         kind = SCORE_KIND[policy]
         for B in args.budgets:
             t1 = time.time()
-            if kind == "brace" and args.brace_mode != "hybrid":
-                feats, errs = __import__("src.controller.rollout", fromlist=["neural_pass"]).neural_pass(
+            if kind == "horizon":
+                feats, _ = __import__("src.controller.rollout", fromlist=["neural_pass"]).neural_pass(
                     models, u_test, solver, p_test, dt)
-                scores = risk["risk_model"].risk_score(
+                scores = risk_hz["risk_model"].risk_score(
                     feats.reshape(-1, feats.shape[-1]), mode=args.brace_mode).reshape(feats.shape[:2])
             else:
                 scores = plan_scores(models, u_test, solver, p_test, dt, kind, risk["risk_model"])
@@ -212,7 +217,8 @@ def main() -> None:
                   f"cost={rec['cost_fraction']:.3f} fail={rec['step_failure_rate']:.3f}",
                   flush=True)
 
-    with open(f"{out_dir}/{args.benchmark}_{args.split}_s{args.seed}_{args.correction_mode}.json", "w") as f:
+    suffix = args.correction_mode + (f"_w{args.window}" if args.correction_mode == "window" else "")
+    with open(f"{out_dir}/{args.benchmark}_{args.split}_s{args.seed}_{suffix}.json", "w") as f:
         json.dump({"config": vars(args), "records": records}, f, indent=2)
     print(f"wrote {len(records)} records in {time.time() - t0:.1f}s")
 

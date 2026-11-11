@@ -1,0 +1,722 @@
+{
+  "checksums": {
+    "burgers1d/train": {
+      "sha256": "b722cb51868af0ba742458274d7ee7745d35008128c309ec5b6e8d50a693c4f9",
+      "matches_metadata": true,
+      "generation_seconds": 77.01
+    },
+    "burgers1d/val": {
+      "sha256": "f4d3b91fa4dc142a1b3005bdfae0cd2fbcec699779d22fdc25aa90312d08a175",
+      "matches_metadata": true,
+      "generation_seconds": 19.16
+    },
+    "burgers1d/test": {
+      "sha256": "7dc557516b3aa475abef15b1c2393d377ed39cea799dd6c44508018161e96c75",
+      "matches_metadata": true,
+      "generation_seconds": 16.86
+    },
+    "burgers1d/ood_param": {
+      "sha256": "4dc1a17f5d8f37f3657b58e97af5fb499142a73df137d050f809d0d3fc274c2b",
+      "matches_metadata": true,
+      "generation_seconds": 12.6
+    },
+    "burgers1d/ood_ic": {
+      "sha256": "e1315859dd0c638d2ac92052090d97aa86100f818be6df23f6b8736287f48fe9",
+      "matches_metadata": true,
+      "generation_seconds": 12.65
+    },
+    "allencahn1d/train": {
+      "sha256": "d2656db182df42e31dad14aa018b422fe5ad676779e94b26fe583eaab6522993",
+      "matches_metadata": true,
+      "generation_seconds": 11.55
+    },
+    "allencahn1d/val": {
+      "sha256": "3575c67015b0c4b6e9683c486004bc98aab709e7c14ce108d8814c9ca7cfe0bb",
+      "matches_metadata": true,
+      "generation_seconds": 2.85
+    },
+    "allencahn1d/test": {
+      "sha256": "b6f7eb04b6f68595a916774acfe2c503f587586bf2e046b68e010096e2431b0a",
+      "matches_metadata": true,
+      "generation_seconds": 2.85
+    },
+    "allencahn1d/ood_param": {
+      "sha256": "68ff036b209a7319776ba68f351e9423187367e7f190ce077a659a37c9a71f48",
+      "matches_metadata": true,
+      "generation_seconds": 2.15
+    },
+    "allencahn1d/ood_ic": {
+      "sha256": "cf61994cf7b6e18d281775cf8c9202ecf95758a85ed44e7bd7d3c24c2c4de78c",
+      "matches_metadata": true,
+      "generation_seconds": 2.2
+    },
+    "advection2d/train": {
+      "sha256": "0fc949179402993e0e89a9813275ca74a6cdce2b86372c592d3d623338e8a905",
+      "matches_metadata": true,
+      "generation_seconds": 34.88
+    },
+    "advection2d/val": {
+      "sha256": "25f92658f5b310e9a5781624e12a9ecc0f2f5dc6efb76b71fdc5420abc5643da",
+      "matches_metadata": true,
+      "generation_seconds": 8.25
+    },
+    "advection2d/test": {
+      "sha256": "fd09e3550258e98b89308409a72345457c054f26746488b95216b83e459ce98e",
+      "matches_metadata": true,
+      "generation_seconds": 8.33
+    },
+    "advection2d/ood_param": {
+      "sha256": "c205bbe532ebedfdf16308f8b8fdf6a57cc059d9a408c6e124f632056cf74a95",
+      "matches_metadata": true,
+      "generation_seconds": 6.46
+    },
+    "advection2d/ood_ic": {
+      "sha256": "76157723bf024a9c633ecee7903fbf3731800594ce669452833645257e0a2ebc",
+      "matches_metadata": true,
+      "generation_seconds": 6.54
+    }
+  },
+  "shapes": {
+    "burgers1d/train": [
+      320,
+      101,
+      128
+    ],
+    "burgers1d/val": [
+      80,
+      101,
+      128
+    ],
+    "burgers1d/test": [
+      80,
+      101,
+      128
+    ],
+    "burgers1d/ood_param": [
+      60,
+      101,
+      128
+    ],
+    "burgers1d/ood_ic": [
+      60,
+      101,
+      128
+    ],
+    "allencahn1d/train": [
+      320,
+      101,
+      128
+    ],
+    "allencahn1d/val": [
+      80,
+      101,
+      128
+    ],
+    "allencahn1d/test": [
+      80,
+      101,
+      128
+    ],
+    "allencahn1d/ood_param": [
+      60,
+      101,
+      128
+    ],
+    "allencahn1d/ood_ic": [
+      60,
+      101,
+      128
+    ],
+    "advection2d/train": [
+      320,
+      101,
+      64,
+      64
+    ],
+    "advection2d/val": [
+      80,
+      101,
+      64,
+      64
+    ],
+    "advection2d/test": [
+      80,
+      101,
+      64,
+      64
+    ],
+    "advection2d/ood_param": [
+      60,
+      101,
+      64,
+      64
+    ],
+    "advection2d/ood_ic": [
+      60,
+      101,
+      64,
+      64
+    ]
+  },
+  "stats": {
+    "burgers1d/train": {
+      "min": -2.9189045429229736,
+      "max": 2.8531901836395264,
+      "mean": 6.627605148717963e-12,
+      "std": 0.6387584805488586,
+      "all_finite": true,
+      "u0_rms_mean": 0.8075970411300659,
+      "uT_rms_mean": 0.452686071395874
+    },
+    "burgers1d/val": {
+      "min": -2.6717946529388428,
+      "max": 2.896383762359619,
+      "mean": 5.532609526764931e-12,
+      "std": 0.6321921944618225,
+      "all_finite": true,
+      "u0_rms_mean": 0.7910446524620056,
+      "uT_rms_mean": 0.45040711760520935
+    },
+    "burgers1d/test": {
+      "min": -2.6286556720733643,
+      "max": 2.7585132122039795,
+      "mean": -9.451540938787417e-11,
+      "std": 0.6396165490150452,
+      "all_finite": true,
+      "u0_rms_mean": 0.814466118812561,
+      "uT_rms_mean": 0.44488590955734253
+    },
+    "burgers1d/ood_param": {
+      "min": -2.899324893951416,
+      "max": 3.211027145385742,
+      "mean": 4.426087621411945e-11,
+      "std": 0.6591629385948181,
+      "all_finite": true,
+      "u0_rms_mean": 0.7779148817062378,
+      "uT_rms_mean": 0.5000091195106506
+    },
+    "burgers1d/ood_ic": {
+      "min": -4.005008220672607,
+      "max": 3.3818929195404053,
+      "mean": 1.1802900323765186e-10,
+      "std": 1.1281936168670654,
+      "all_finite": true,
+      "u0_rms_mean": 1.4408103227615356,
+      "uT_rms_mean": 0.7050374150276184
+    },
+    "allencahn1d/train": {
+      "min": -1.183478593826294,
+      "max": 1.1881707906723022,
+      "mean": -0.00025184405967593193,
+      "std": 0.45004919171333313,
+      "all_finite": true,
+      "u0_rms_mean": 0.3297481834888458,
+      "uT_rms_mean": 0.551755428314209
+    },
+    "allencahn1d/val": {
+      "min": -1.0305070877075195,
+      "max": 1.1419554948806763,
+      "mean": -0.0006183026125654578,
+      "std": 0.43928262591362,
+      "all_finite": true,
+      "u0_rms_mean": 0.31940293312072754,
+      "uT_rms_mean": 0.542473316192627
+    },
+    "allencahn1d/test": {
+      "min": -1.0239781141281128,
+      "max": 1.080410122871399,
+      "mean": 0.00131749187130481,
+      "std": 0.45302650332450867,
+      "all_finite": true,
+      "u0_rms_mean": 0.3340412676334381,
+      "uT_rms_mean": 0.5529069304466248
+    },
+    "allencahn1d/ood_param": {
+      "min": -1.0756884813308716,
+      "max": 1.1676784753799438,
+      "mean": 0.0016341841546818614,
+      "std": 0.4379056990146637,
+      "all_finite": true,
+      "u0_rms_mean": 0.31119683384895325,
+      "uT_rms_mean": 0.5457497835159302
+    },
+    "allencahn1d/ood_ic": {
+      "min": -1.6870125532150269,
+      "max": 1.7402063608169556,
+      "mean": -0.00339554063975811,
+      "std": 0.7825872898101807,
+      "all_finite": true,
+      "u0_rms_mean": 0.7496833205223083,
+      "uT_rms_mean": 0.8327978849411011
+    },
+    "advection2d/train": {
+      "min": -3.9521172046661377,
+      "max": 3.547816753387451,
+      "mean": 2.0170972097471873e-12,
+      "std": 0.7364417910575867,
+      "all_finite": true,
+      "u0_rms_mean": 0.8044689297676086,
+      "uT_rms_mean": 0.6625580787658691
+    },
+    "advection2d/val": {
+      "min": -3.280378580093384,
+      "max": 3.490328788757324,
+      "mean": -3.4924597935859225e-11,
+      "std": 0.7319294214248657,
+      "all_finite": true,
+      "u0_rms_mean": 0.8008200526237488,
+      "uT_rms_mean": 0.6590839624404907
+    },
+    "advection2d/test": {
+      "min": -3.3061206340789795,
+      "max": 3.848762273788452,
+      "mean": -2.0747284099065233e-12,
+      "std": 0.733750581741333,
+      "all_finite": true,
+      "u0_rms_mean": 0.8049200773239136,
+      "uT_rms_mean": 0.66096031665802
+    },
+    "advection2d/ood_param": {
+      "min": -3.7908716201782227,
+      "max": 3.7462151050567627,
+      "mean": 7.83786299751732e-11,
+      "std": 0.8017560243606567,
+      "all_finite": true,
+      "u0_rms_mean": 0.8195762634277344,
+      "uT_rms_mean": 0.7687473893165588
+    },
+    "advection2d/ood_ic": {
+      "min": -1.2337840795516968,
+      "max": 1.1304839849472046,
+      "mean": -2.295648697178687e-12,
+      "std": 0.12247820943593979,
+      "all_finite": true,
+      "u0_rms_mean": 0.21357837319374084,
+      "uT_rms_mean": 0.07680345326662064
+    }
+  },
+  "leakage": {
+    "train_vs_val_burgers1d": 0,
+    "train_vs_test_burgers1d": 0,
+    "train_vs_ood_param_burgers1d": 0,
+    "train_vs_ood_ic_burgers1d": 0,
+    "val_vs_test_burgers1d": 0,
+    "val_vs_ood_param_burgers1d": 0,
+    "val_vs_ood_ic_burgers1d": 0,
+    "test_vs_ood_param_burgers1d": 0,
+    "test_vs_ood_ic_burgers1d": 0,
+    "ood_param_vs_ood_ic_burgers1d": 0,
+    "train_vs_val_allencahn1d": 0,
+    "train_vs_test_allencahn1d": 0,
+    "train_vs_ood_param_allencahn1d": 0,
+    "train_vs_ood_ic_allencahn1d": 0,
+    "val_vs_test_allencahn1d": 0,
+    "val_vs_ood_param_allencahn1d": 0,
+    "val_vs_ood_ic_allencahn1d": 0,
+    "test_vs_ood_param_allencahn1d": 0,
+    "test_vs_ood_ic_allencahn1d": 0,
+    "ood_param_vs_ood_ic_allencahn1d": 0,
+    "train_vs_val_advection2d": 0,
+    "train_vs_test_advection2d": 0,
+    "train_vs_ood_param_advection2d": 0,
+    "train_vs_ood_ic_advection2d": 0,
+    "val_vs_test_advection2d": 0,
+    "val_vs_ood_param_advection2d": 0,
+    "val_vs_ood_ic_advection2d": 0,
+    "test_vs_ood_param_advection2d": 0,
+    "test_vs_ood_ic_advection2d": 0,
+    "ood_param_vs_ood_ic_advection2d": 0
+  },
+  "ood_ranges": {
+    "burgers1d/train": {
+      "nu": [
+        0.005011274013668299,
+        0.019922427833080292
+      ],
+      "cx": [
+        1.0,
+        1.0
+      ],
+      "cy": [
+        0.5,
+        0.5
+      ],
+      "eps": [
+        0.009999999776482582,
+        0.009999999776482582
+      ],
+      "length_scale": [
+        0.2014015018939972,
+        0.49990561604499817
+      ],
+      "amplitude": [
+        0.6047961711883545,
+        0.9999198317527771
+      ]
+    },
+    "burgers1d/val": {
+      "nu": [
+        0.005203395616263151,
+        0.019196270033717155
+      ],
+      "cx": [
+        1.0,
+        1.0
+      ],
+      "cy": [
+        0.5,
+        0.5
+      ],
+      "eps": [
+        0.009999999776482582,
+        0.009999999776482582
+      ],
+      "length_scale": [
+        0.2023676633834839,
+        0.4983924329280853
+      ],
+      "amplitude": [
+        0.6000194549560547,
+        0.9985733032226562
+      ]
+    },
+    "burgers1d/test": {
+      "nu": [
+        0.005075578112155199,
+        0.018666552379727364
+      ],
+      "cx": [
+        1.0,
+        1.0
+      ],
+      "cy": [
+        0.5,
+        0.5
+      ],
+      "eps": [
+        0.009999999776482582,
+        0.009999999776482582
+      ],
+      "length_scale": [
+        0.2008897215127945,
+        0.4971139430999756
+      ],
+      "amplitude": [
+        0.6113750338554382,
+        0.997241735458374
+      ]
+    },
+    "burgers1d/ood_param": {
+      "nu": [
+        0.001516782445833087,
+        0.003424030262976885
+      ],
+      "cx": [
+        1.0,
+        1.0
+      ],
+      "cy": [
+        0.5,
+        0.5
+      ],
+      "eps": [
+        0.009999999776482582,
+        0.009999999776482582
+      ],
+      "length_scale": [
+        0.20079822838306427,
+        0.4997318387031555
+      ],
+      "amplitude": [
+        0.6010950207710266,
+        0.9934277534484863
+      ]
+    },
+    "burgers1d/ood_ic": {
+      "nu": [
+        0.005201771389693022,
+        0.019793719053268433
+      ],
+      "cx": [
+        1.0,
+        1.0
+      ],
+      "cy": [
+        0.5,
+        0.5
+      ],
+      "eps": [
+        0.009999999776482582,
+        0.009999999776482582
+      ],
+      "length_scale": [
+        0.7057345509529114,
+        0.9949023723602295
+      ],
+      "amplitude": [
+        1.2505396604537964,
+        1.5959476232528687
+      ]
+    },
+    "allencahn1d/train": {
+      "nu": [
+        0.0,
+        0.0
+      ],
+      "cx": [
+        1.0,
+        1.0
+      ],
+      "cy": [
+        0.5,
+        0.5
+      ],
+      "eps": [
+        0.00800974853336811,
+        0.013983180746436119
+      ],
+      "length_scale": [
+        0.20093433558940887,
+        0.39993706345558167
+      ],
+      "amplitude": [
+        0.2029975950717926,
+        0.44994989037513733
+      ]
+    },
+    "allencahn1d/val": {
+      "nu": [
+        0.0,
+        0.0
+      ],
+      "cx": [
+        1.0,
+        1.0
+      ],
+      "cy": [
+        0.5,
+        0.5
+      ],
+      "eps": [
+        0.008172575384378433,
+        0.013822478242218494
+      ],
+      "length_scale": [
+        0.20157843828201294,
+        0.39892828464508057
+      ],
+      "amplitude": [
+        0.2000121772289276,
+        0.4491083025932312
+      ]
+    },
+    "allencahn1d/test": {
+      "nu": [
+        0.0,
+        0.0
+      ],
+      "cx": [
+        1.0,
+        1.0
+      ],
+      "cy": [
+        0.5,
+        0.5
+      ],
+      "eps": [
+        0.008064932189881802,
+        0.013701366260647774
+      ],
+      "length_scale": [
+        0.20059314370155334,
+        0.39807596802711487
+      ],
+      "amplitude": [
+        0.20710940659046173,
+        0.4482760727405548
+      ]
+    },
+    "allencahn1d/ood_param": {
+      "nu": [
+        0.0,
+        0.0
+      ],
+      "cx": [
+        1.0,
+        1.0
+      ],
+      "cy": [
+        0.5,
+        0.5
+      ],
+      "eps": [
+        0.004032828379422426,
+        0.006435250863432884
+      ],
+      "length_scale": [
+        0.20053215324878693,
+        0.3998212218284607
+      ],
+      "amplitude": [
+        0.20068439841270447,
+        0.445892333984375
+      ]
+    },
+    "allencahn1d/ood_ic": {
+      "nu": [
+        0.0,
+        0.0
+      ],
+      "cx": [
+        1.0,
+        1.0
+      ],
+      "cy": [
+        0.5,
+        0.5
+      ],
+      "eps": [
+        0.009999999776482582,
+        0.009999999776482582
+      ],
+      "length_scale": [
+        0.6085612177848816,
+        0.8977563977241516
+      ],
+      "amplitude": [
+        0.6538230180740356,
+        0.8466015458106995
+      ]
+    },
+    "advection2d/train": {
+      "nu": [
+        0.005024370271712542,
+        0.019957950338721275
+      ],
+      "cx": [
+        0.5046716928482056,
+        1.4996854066848755
+      ],
+      "cy": [
+        0.3059951961040497,
+        0.7998997569084167
+      ],
+      "eps": [
+        0.009999999776482582,
+        0.009999999776482582
+      ],
+      "length_scale": [
+        0.2503752112388611,
+        0.4481201767921448
+      ],
+      "amplitude": [
+        0.6005989909172058,
+        0.9964551329612732
+      ]
+    },
+    "advection2d/val": {
+      "nu": [
+        0.005431439261883497,
+        0.0195561945438385
+      ],
+      "cx": [
+        0.5078921914100647,
+        1.4946415424346924
+      ],
+      "cy": [
+        0.3000243306159973,
+        0.7982165813446045
+      ],
+      "eps": [
+        0.009999999776482582,
+        0.009999999776482582
+      ],
+      "length_scale": [
+        0.2513561546802521,
+        0.4487137496471405
+      ],
+      "amplitude": [
+        0.6102072596549988,
+        0.9954087734222412
+      ]
+    },
+    "advection2d/test": {
+      "nu": [
+        0.005162330344319344,
+        0.01925341598689556
+      ],
+      "cx": [
+        0.5029657483100891,
+        1.490379810333252
+      ],
+      "cy": [
+        0.31421881914138794,
+        0.7965521812438965
+      ],
+      "eps": [
+        0.009999999776482582,
+        0.009999999776482582
+      ],
+      "length_scale": [
+        0.2512738108634949,
+        0.4489654004573822
+      ],
+      "amplitude": [
+        0.6018637418746948,
+        0.9962465167045593
+      ]
+    },
+    "advection2d/ood_param": {
+      "nu": [
+        0.002039393875747919,
+        0.004922301042824984
+      ],
+      "cx": [
+        1.8015965223312378,
+        2.399463653564453
+      ],
+      "cy": [
+        0.9008212685585022,
+        1.1950708627700806
+      ],
+      "eps": [
+        0.009999999776482582,
+        0.009999999776482582
+      ],
+      "length_scale": [
+        0.2537281811237335,
+        0.4486992657184601
+      ],
+      "amplitude": [
+        0.6147403717041016,
+        0.9963822364807129
+      ]
+    },
+    "advection2d/ood_ic": {
+      "nu": [
+        0.0054280622862279415,
+        0.01988781988620758
+      ],
+      "cx": [
+        0.519115149974823,
+        1.4830079078674316
+      ],
+      "cy": [
+        0.30077090859413147,
+        0.7942109107971191
+      ],
+      "eps": [
+        0.009999999776482582,
+        0.009999999776482582
+      ],
+      "length_scale": [
+        0.060595035552978516,
+        0.11675141006708145
+      ],
+      "amplitude": [
+        0.15190812945365906,
+        0.299460768699646
+      ]
+    }
+  }
+}

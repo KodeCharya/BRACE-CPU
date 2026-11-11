@@ -133,6 +133,7 @@ def adaptive_execute(models, u_ref, benchmark: str, params: dict, dt: float, bud
     pre_errs = np.zeros((n, T))
     actions = np.zeros((n, T), dtype=bool)
     cost = np.zeros(n)
+    t_start = time.time()
     for t in range(T):
         preds = ensemble_predict(models, u, device=device)
         mean = _mean(preds)
@@ -164,6 +165,7 @@ def adaptive_execute(models, u_ref, benchmark: str, params: dict, dt: float, bud
         "cost_per_traj": cost,
         "intervention_fraction": float(actions.mean()),
         "actions": actions,
+        "wall_seconds": time.time() - t_start,
         "metrics": summarize(errs, pre_errs, cost / T, actions, fail_tau),
     }
 

@@ -61,6 +61,7 @@ class RiskModel:
         self.l2 = l2
         self.mask = None if mask is None else np.asarray(mask, dtype=bool)
         self.feature_names = [n for n, keep in zip(FEATURE_NAMES, self.mask)] if self.mask is not None else FEATURE_NAMES
+        self.horizon_tau = None
 
     def _apply(self, X: np.ndarray) -> np.ndarray:
         X = np.asarray(X, dtype=np.float64)
@@ -72,9 +73,10 @@ class RiskModel:
         self.mu = None
         self.sd = None
 
-    def fit(self, X: np.ndarray, errors: np.ndarray) -> "RiskModel":
+    def fit(self, X: np.ndarray, errors: np.ndarray, labels: np.ndarray | None = None,
+            log_target: np.ndarray | None = None) -> "RiskModel":
         X = self._apply(X)
-        y = (errors > self.tau_fail).astype(np.float64)
+        y = (errors > self.tau_fail).astype(np.float64) if labels is None else np.asarray(labels, dtype=np.float64)
         self.mu, self.sd = _standardize_fit(X)
         Z = (X - self.mu) / self.sd
         n, d = Z.shape
@@ -92,8 +94,9 @@ class RiskModel:
             if np.max(np.abs(step)) < 1e-8:
                 break
         self.w_logit, self.b_logit = w, b
-        # Ridge regression on log error.
-        target = np.log(np.maximum(errors, 1e-6))
+        # Ridge regression on log error (or a supplied horizon target).
+        target = (np.log(np.maximum(errors, 1e-6)) if log_target is None
+                  else np.asarray(log_target, dtype=np.float64))
         A = Z.T @ Z + self.l2 * n * np.eye(d)
         self.w_ridge = np.linalg.solve(A, Z.T @ (target - target.mean()))
         self.b_ridge = float(target.mean())
