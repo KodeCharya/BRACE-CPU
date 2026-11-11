@@ -1,0 +1,46 @@
+{
+  "tag": "pilot_burgers",
+  "benchmark": "burgers1d",
+  "model": "fno1d",
+  "members": [
+    {
+      "member": 0,
+      "seed": 99000,
+      "val_rel_l2": 0.12398451566696167,
+      "val_final_rel_l2": 0.17287209630012512,
+      "train_seconds": 77.55125546455383,
+      "epochs": 6,
+      "config": {
+        "benchmark": "burgers1d",
+        "model": "fno1d",
+        "members": 1,
+        "seed": 99,
+        "epochs": 6,
+        "stride": 2,
+        "batch_size": 32,
+        "lr": 0.002,
+        "width": 24,
+        "modes": 12,
+        "layers": 3,
+        "downsample_to": 0,
+        "tag": "pilot_burgers"
+      }
+    }
+  ],
+  "config": {
+    "benchmark": "burgers1d",
+    "model": "fno1d",
+    "members": 1,
+    "seed": 99,
+    "epochs": 6,
+    "stride": 2,
+    "batch_size": 32,
+    "lr": 0.002,
+    "width": 24,
+    "modes": 12,
+    "layers": 3,
+    "downsample_to": 0,
+    "tag": "pilot_burgers"
+  },
+  "dt_save": 0.019999999552965164
+}
