@@ -1,0 +1,61 @@
+{
+  "device": "cpu",
+  "torch_threads": 4,
+  "torch_version": "2.15.0+cpu",
+  "cuda_available": false,
+  "cpu_count": 4,
+  "models": {
+    "fno1d_w32_m32_l4": {
+      "params": 137538,
+      "batch": 40,
+      "latency_ms_per_batch": 5.3270125994458795,
+      "latency_ms_per_sample": 0.133175314986147
+    },
+    "fno1d_w32_m24_l4": {
+      "params": 104770,
+      "batch": 40,
+      "latency_ms_per_batch": 4.642781700385967,
+      "latency_ms_per_sample": 0.11606954250964918
+    },
+    "fno2d_w16_m8_l3_32x32": {
+      "params": 51154,
+      "batch": 24,
+      "latency_ms_per_batch": 20.075994099897798,
+      "latency_ms_per_sample": 0.8364997541624083
+    },
+    "deeponet1d_p128": {
+      "params": 103393,
+      "batch": 40,
+      "latency_ms_per_batch": 0.2869279502192512,
+      "latency_ms_per_sample": 0.00717319875548128
+    }
+  },
+  "reference_solver": {
+    "burgers1d": {
+      "substep_ms": 0.2182762199663557,
+      "substeps_per_interval": 10,
+      "interval_ms": 2.104736797627993
+    },
+    "allencahn1d": {
+      "substep_ms": 0.06736126000760123,
+      "substeps_per_interval": 5,
+      "interval_ms": 0.3364731994224712
+    },
+    "advection2d": {
+      "substep_ms": 0.095532420091331,
+      "substeps_per_interval": 2,
+      "interval_ms": 0.18754079996142536
+    }
+  },
+  "planning": {
+    "trajectories": 40,
+    "steps": 100,
+    "ensemble": 3,
+    "seconds": 1.6352052470028866,
+    "ms_per_trajectory_step": 0.40880131175072165
+  },
+  "memory": {
+    "peak_rss_mib": 333.48046875,
+    "system_total_mib": 7327.453125
+  }
+}

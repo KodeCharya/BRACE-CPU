@@ -133,6 +133,59 @@ def analyse(benchmark: str, tag: str, split: str, n_traj: int, n_bins: int,
     }
 
 
+def write_outputs(out: list[dict], out_path: str) -> None:
+    """Persist the diagnostic as JSON, a flat CSV and one figure per benchmark."""
+    import csv
+
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    with open(out_path, "w") as f:
+        json.dump({"runs": out}, f, indent=2)
+
+    rows = []
+    for r in out:
+        for b in r["bins"]:
+            rows.append({"benchmark": r["benchmark"], "split": r["split"],
+                         "tag": r["tag"], "bin": b["bin"],
+                         "mean_pre_error": b["mean_pre_error"],
+                         "mean_gain": b["mean_gain"],
+                         "mean_relative_gain": b["mean_relative_gain"],
+                         "harm_rate": b["harm_rate"]})
+    if rows:
+        os.makedirs("results/tables", exist_ok=True)
+        path = "results/tables/gain_decay.csv"
+        with open(path, "w", newline="") as f:
+            w = csv.DictWriter(f, fieldnames=list(rows[0]))
+            w.writeheader()
+            w.writerows(rows)
+
+    try:
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+    except ImportError:
+        return
+    os.makedirs("results/figures", exist_ok=True)
+    fig, axes = plt.subplots(1, 2, figsize=(9, 3.4))
+    for r in out:
+        bins = [b["bin"] for b in r["bins"]]
+        axes[0].plot(bins, [b["mean_relative_gain"] for b in r["bins"]],
+                     marker="o", ms=3, label=f"{r['benchmark']}/{r['split']}")
+        axes[1].plot(bins, [b["harm_rate"] for b in r["bins"]],
+                     marker="o", ms=3, label=f"{r['benchmark']}/{r['split']}")
+    axes[0].set_xlabel("horizon decile")
+    axes[0].set_ylabel("mean relative gain")
+    axes[0].set_title("Value of a correction decays with horizon position")
+    axes[1].set_xlabel("horizon decile")
+    axes[1].set_ylabel("fraction of harmful corrections")
+    axes[1].set_title("Harm rate rises late in the rollout")
+    for ax in axes:
+        ax.grid(alpha=0.3)
+    axes[0].legend(fontsize=6)
+    fig.tight_layout()
+    fig.savefig("results/figures/gain_decay.png", dpi=160)
+    plt.close(fig)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="results/processed/gain_decay.json")
@@ -168,9 +221,7 @@ def main() -> None:
               f"{r['relative_gain_late']:+.3f}; harm rate {r['harm_rate']:.3f}; "
               f"rho(pre, rel gain)={r['spearman_pre_vs_relative_gain']:+.3f}", flush=True)
 
-    os.makedirs(os.path.dirname(args.out), exist_ok=True)
-    with open(args.out, "w") as f:
-        json.dump({"runs": out}, f, indent=2)
+    write_outputs(out, args.out)
     print(f"wrote {args.out}")
 
 
