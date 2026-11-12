@@ -58,6 +58,11 @@ def write_csv(path: str, rows: list[dict], fields: list[str]) -> None:
             f.write(",".join(vals) + "\n")
 
 
+def _nanmean(vals):
+    vals = [float(v) for v in vals if v == v]
+    return float(np.mean(vals)) if vals else float("nan")
+
+
 def aggregate(recs):
     groups = defaultdict(list)
     for r in recs:
@@ -87,6 +92,10 @@ def aggregate(recs):
             "plan_seconds": float(np.mean([r.get("plan_seconds", 0) for r in rs])),
             "total_seconds": float(np.mean([r.get("total_seconds", r.get("wall_seconds", 0))
                                             for r in rs])),
+            "pre_rel_l2_mean": float(np.mean([r.get("pre_rel_l2_mean", float("nan")) for r in rs])),
+            "action_time_mean": float(np.mean([r.get("action_time_mean", float("nan")) for r in rs])),
+            "correction_gain_mean": _nanmean([r.get("correction_gain_mean", float("nan")) for r in rs]),
+            "correction_harm_rate": _nanmean([r.get("correction_harm_rate", float("nan")) for r in rs]),
         })
     return rows
 
@@ -311,6 +320,66 @@ def plot_bar_at_budget(agg, exp_id, budget=0.2, out_dir="results/figures"):
         plt.close(fig)
 
 
+def export_correction_gain(exp_id: str = "main", budget: float = 0.2,
+                           out_dir: str = "results/figures"):
+    """Correction gain (pre-error minus post-error) as a function of horizon position.
+
+    Averaged over test trajectories and seeds. A positive value means the
+    numerical correction reduced the one-step error at that step.
+    """
+    recs = load_records(exp_id)
+    rows = []
+    for bench in sorted({r["benchmark"] for r in recs}):
+        sub = [r for r in recs if r["benchmark"] == bench
+               and "correction_gain_profile" in r
+               and r.get("budget") is not None
+               and abs(float(r["budget"]) - budget) < 1e-9
+               and r.get("variant", "") == ""]
+        if not sub:
+            continue
+        fig, ax = plt.subplots(figsize=(6, 3.8))
+        for pol in ["early", "uniform", "ranked_ensemble", "brace", "brace_combo"]:
+            rs = [r for r in sub if r["policy"] == pol]
+            if not rs:
+                continue
+            prof = np.array([r["correction_gain_profile"] for r in rs], dtype=float)
+            act = np.array([r["correction_by_time_profile"] for r in rs], dtype=float)
+            ax.plot(np.nanmean(prof, axis=0), marker=".", ms=3, label=pol)
+            for j in range(prof.shape[1]):
+                rows.append({"benchmark": bench, "budget": budget, "policy": pol,
+                             "bin": j, "mean_gain": float(np.nanmean(prof[:, j]))
+                             if np.any(~np.isnan(prof[:, j])) else "",
+                             "action_rate": float(act[:, j].mean())})
+        ax.axhline(0, color="k", lw=0.8)
+        ax.set_xlabel("normalised horizon position (20 bins)")
+        ax.set_ylabel("mean error reduction per correction")
+        ax.set_title(f"{bench}: local correction gain at B={budget:g}")
+        ax.legend(fontsize=7)
+        ax.grid(alpha=0.3)
+        fig.tight_layout()
+        fig.savefig(f"{out_dir}/{exp_id}_correction_gain_{bench}_B{int(budget*100)}.png", dpi=150)
+        plt.close(fig)
+    if rows:
+        write_csv(f"results/tables/{exp_id}_correction_gain.csv", rows,
+                  ["benchmark", "budget", "policy", "bin", "mean_gain", "action_rate"])
+
+
+def summary_at_budget(agg, exp_id: str):
+    """Compact per-benchmark comparison at each declared budget."""
+    rows = []
+    for r in agg:
+        if r.get("variant", "") != "" or r["budget"] == "":
+            continue
+        rows.append({k: r[k] for k in ("benchmark", "split", "policy", "budget", "n_seeds",
+                                       "rel_l2_mean", "rel_l2_seed_min", "rel_l2_seed_max",
+                                       "rel_l2_ci95", "cost_fraction", "step_failure_rate",
+                                       "correction_gain_mean", "correction_harm_rate")})
+    write_csv(f"results/tables/{exp_id}_at_budget.csv", rows,
+              ["benchmark", "split", "policy", "budget", "n_seeds", "rel_l2_mean",
+               "rel_l2_seed_min", "rel_l2_seed_max", "rel_l2_ci95", "cost_fraction",
+               "step_failure_rate", "correction_gain_mean", "correction_harm_rate"])
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--exp-id", default="main")
@@ -323,7 +392,9 @@ def main() -> None:
               ["benchmark", "split", "variant", "policy", "budget", "n_seeds", "rel_l2_mean",
                "rel_l2_seed_min", "rel_l2_seed_max", "rel_l2_ci95", "rel_l2_final",
                "rel_l2_max", "step_failure_rate",
-               "traj_failure_rate", "cost_fraction", "intervention_fraction", "wall_seconds",
+               "traj_failure_rate", "cost_fraction", "intervention_fraction",
+               "pre_rel_l2_mean", "action_time_mean", "correction_gain_mean",
+               "correction_harm_rate", "wall_seconds",
                "plan_seconds", "total_seconds"])
     pairs = paired_analysis(recs)
     write_csv(f"results/tables/{args.exp_id}_paired.csv", pairs,
@@ -372,6 +443,8 @@ def main() -> None:
     plot_budget_fidelity(agg, args.exp_id)
     for b in (0.1, 0.2, 0.4):
         plot_bar_at_budget(agg, args.exp_id, b)
+    export_correction_gain(args.exp_id, budget=0.2)
+    summary_at_budget(agg, args.exp_id)
     with open(f"results/processed/{args.exp_id}_summary.json", "w") as f:
         json.dump({"aggregate": agg, "paired": pairs, "risk": rrows}, f, indent=2)
     print(f"aggregated {len(recs)} records -> {len(agg)} groups, {len(pairs)} comparisons")

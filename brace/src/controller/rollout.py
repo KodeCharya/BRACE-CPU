@@ -170,6 +170,34 @@ def adaptive_execute(models, u_ref, benchmark: str, params: dict, dt: float, bud
     }
 
 
+def correction_diagnostics(errs, pre_errs, actions, n_bins: int = 20) -> dict:
+    """Per-correction error change: positive = correction reduced error.
+
+    ``pre_errs`` is the error of the neural prediction at the same step, so this
+    isolates the local effect of applying the reference solver.
+    """
+    a = np.asarray(actions, dtype=bool)
+    if a.sum() == 0:
+        return {"correction_gain_mean": float("nan"), "correction_harm_rate": float("nan"),
+                "correction_gain_profile": [float("nan")] * n_bins,
+                "correction_by_time_profile": [0.0] * n_bins}
+    gain = np.where(a, pre_errs - errs, np.nan)
+    T = errs.shape[1]
+    edges = np.linspace(0, T, n_bins + 1).astype(int)
+    gp, cp = [], []
+    for i in range(n_bins):
+        sl = slice(edges[i], max(edges[i] + 1, edges[i + 1]))
+        g = gain[:, sl]
+        gp.append(float(np.nanmean(g)) if np.any(~np.isnan(g)) else float("nan"))
+        cp.append(float(np.mean(a[:, sl])))
+    return {
+        "correction_gain_mean": float(np.nanmean(gain)),
+        "correction_harm_rate": float(np.mean(errs[a] > pre_errs[a])),
+        "correction_gain_profile": gp,
+        "correction_by_time_profile": cp,
+    }
+
+
 def summarize(errs, pre_errs, cost_fraction, actions, fail_tau=0.1) -> dict:
     per_traj_mean = errs.mean(axis=1)
     per_traj_final = errs[:, -1]
@@ -190,4 +218,5 @@ def summarize(errs, pre_errs, cost_fraction, actions, fail_tau=0.1) -> dict:
         "action_profile": actions.mean(axis=0).tolist(),
         "action_time_mean": float((actions * np.arange(actions.shape[1])[None, :]).sum()
                                   / max(actions.sum(), 1)),
+        **correction_diagnostics(errs, pre_errs, actions),
     }
