@@ -1,17 +1,15 @@
-\begin{tabular}{llrrrrrr}
+\begin{tabular}{llrrrrrrr}
 \toprule
-Benchmark & Split & AUROC res. & AUROC ens. & AUROC cal. & ECE & Brier & cov. \\
+Benchmark & Split & seeds & AUROC res. & AUROC ens. & AUROC cal. & ECE & Brier & cov. \\
 \midrule
-burgers1d & test & 0.714 & 0.666 & 0.821 & 0.125 & 0.187 & 0.929 \\
-burgers1d & test & 0.708 & 0.684 & 0.801 & 0.145 & 0.203 & 0.944 \\
-burgers1d & ood_param & 0.999 & 0.708 & 0.994 & 0.256 & 0.133 & 0.430 \\
-burgers1d & ood_param & 0.999 & 0.708 & 0.994 & 0.271 & 0.143 & 0.490 \\
-burgers1d & ood_ic & 0.995 & 0.899 & 0.993 & 0.054 & 0.041 & 0.585 \\
-allencahn1d & test & nan & nan & nan & 0.001 & 0.000 & 0.817 \\
-allencahn1d & ood_param & 0.865 & 0.376 & 0.708 & 0.196 & 0.196 & 0.550 \\
-allencahn1d & ood_ic & 0.961 & 0.941 & 0.301 & 0.011 & 0.012 & 0.209 \\
-advection2d & test & 0.611 & 0.525 & 0.632 & 0.507 & 0.507 & 0.879 \\
-advection2d & ood_param & 0.782 & 0.405 & 0.836 & 0.347 & 0.347 & 0.045 \\
-advection2d & ood_ic & nan & nan & nan & 0.004 & 0.004 & 0.007 \\
+burgers1d & test & 2 & 0.711 & 0.675 & 0.811 & 0.135 & 0.195 & 0.936 \\
+burgers1d & ood_param & 2 & 0.999 & 0.708 & 0.994 & 0.263 & 0.138 & 0.460 \\
+burgers1d & ood_ic & 1 & 0.995 & 0.899 & 0.993 & 0.054 & 0.041 & 0.585 \\
+allencahn1d & test & 1 & -- & -- & -- & 0.001 & 0.000 & 0.817 \\
+allencahn1d & ood_param & 1 & 0.865 & 0.376 & 0.708 & 0.196 & 0.196 & 0.550 \\
+allencahn1d & ood_ic & 1 & 0.961 & 0.941 & 0.301 & 0.011 & 0.012 & 0.209 \\
+advection2d & test & 1 & 0.611 & 0.525 & 0.632 & 0.507 & 0.507 & 0.879 \\
+advection2d & ood_param & 1 & 0.782 & 0.405 & 0.836 & 0.347 & 0.347 & 0.045 \\
+advection2d & ood_ic & 1 & -- & -- & -- & 0.004 & 0.004 & 0.007 \\
 \bottomrule
 \end{tabular}

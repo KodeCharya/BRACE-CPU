@@ -1,0 +1,39 @@
+\begin{tabular}{lllrrr}
+\toprule
+Benchmark & Split & Policy & $B=0.1$ & $B=0.2$ & $B=0.4$ \\
+\midrule
+burgers1d & test & surrogate only & 0.061 & 0.061 & 0.061 \\
+burgers1d & test & uniform & 0.041/0.10 & 0.031/0.20 & 0.021/0.40 \\
+burgers1d & test & early & 0.055/0.10 & 0.042/0.20 & 0.018/0.40 \\
+burgers1d & test & residual-ranked & 0.043/0.10 & 0.036/0.20 & 0.027/0.40 \\
+burgers1d & test & ensemble-ranked & 0.039/0.10 & 0.030/0.20 & 0.019/0.40 \\
+burgers1d & test & BRACE & 0.040/0.10 & 0.032/0.20 & 0.021/0.40 \\
+burgers1d & test & BRACE-fusion & 0.039/0.10 & 0.031/0.20 & 0.020/0.40 \\
+burgers1d & test & gain-ranked & 0.043/0.10 & 0.036/0.20 & 0.027/0.40 \\
+burgers1d & test & gain oracle & 0.041/0.10 & 0.033/0.20 & 0.024/0.40 \\
+burgers1d & test & oracle & 0.048/0.10 & 0.043/0.20 & 0.035/0.40 \\
+\midrule
+allencahn1d & test & surrogate only & 0.008 & 0.008 & 0.008 \\
+allencahn1d & test & uniform & 0.007/0.10 & 0.006/0.20 & 0.005/0.40 \\
+allencahn1d & test & early & 0.006/0.10 & 0.005/0.20 & 0.003/0.40 \\
+allencahn1d & test & residual-ranked & 0.007/0.10 & 0.007/0.20 & 0.006/0.40 \\
+allencahn1d & test & ensemble-ranked & 0.006/0.10 & 0.005/0.20 & 0.003/0.40 \\
+allencahn1d & test & BRACE & 0.007/0.10 & 0.006/0.20 & 0.004/0.40 \\
+allencahn1d & test & BRACE-fusion & 0.006/0.10 & 0.005/0.20 & 0.003/0.40 \\
+allencahn1d & test & gain-ranked & 0.007/0.10 & 0.006/0.20 & 0.004/0.40 \\
+allencahn1d & test & gain oracle & 0.007/0.10 & 0.006/0.20 & 0.005/0.40 \\
+allencahn1d & test & oracle & 0.007/0.10 & 0.007/0.20 & 0.006/0.40 \\
+\midrule
+advection2d & test & surrogate only & 0.554 & 0.554 & 0.554 \\
+advection2d & test & uniform & 0.507/0.10 & 0.459/0.20 & 0.356/0.40 \\
+advection2d & test & early & 0.453/0.10 & 0.361/0.20 & 0.207/0.40 \\
+advection2d & test & residual-ranked & 0.483/0.10 & 0.417/0.20 & 0.305/0.40 \\
+advection2d & test & ensemble-ranked & 0.469/0.10 & 0.393/0.20 & 0.255/0.40 \\
+advection2d & test & BRACE & 0.486/0.10 & 0.417/0.20 & 0.295/0.40 \\
+advection2d & test & BRACE-fusion & 0.483/0.10 & 0.411/0.20 & 0.281/0.40 \\
+advection2d & test & gain-ranked & 0.472/0.10 & 0.406/0.20 & 0.287/0.40 \\
+advection2d & test & gain oracle & 0.454/0.10 & 0.366/0.20 & 0.218/0.40 \\
+advection2d & test & oracle & 0.551/0.10 & 0.539/0.20 & 0.488/0.40 \\
+\midrule
+\bottomrule
+\end{tabular}

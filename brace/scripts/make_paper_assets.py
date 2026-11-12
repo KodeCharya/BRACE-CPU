@@ -114,18 +114,28 @@ def main_table(exp_id: str = "main") -> str:
 
 def risk_table(exp_id: str = "main") -> str:
     rows = read_csv(f"results/tables/{exp_id}_risk.csv")
-    lines = [r"\begin{tabular}{llrrrrrr}", r"\toprule",
-             r"Benchmark & Split & AUROC res. & AUROC ens. & AUROC cal. & ECE & Brier & cov. \\",
+    fields = ("auroc_residual", "auroc_ensemble", "auroc_calibrated", "ece",
+              "brier", "conformal_coverage")
+    lines = [r"\begin{tabular}{llrrrrrrr}", r"\toprule",
+             r"Benchmark & Split & seeds & AUROC res. & AUROC ens. & AUROC cal. & ECE & Brier & cov. \\",
              r"\midrule"]
     for bench, split in SPLITS:
         sub = [r for r in rows if r["benchmark"] == bench and r["split"] == split]
-        for r in sub:
-            lines.append(
-                f"{bench} & {split} & {fmt(r['auroc_residual'])} & "
-                f"{fmt(r['auroc_ensemble'])} & {fmt(r['auroc_calibrated'])} & "
-                f"{fmt(r['ece'])} & {fmt(r['brier'])} & "
-                f"{fmt(r['conformal_coverage'])} \\\\"
-            )
+        if not sub:
+            continue
+        cells = []
+        for f in fields:
+            vals = []
+            for r in sub:
+                try:
+                    v = float(r[f])
+                except (ValueError, KeyError):
+                    continue
+                if v == v:
+                    vals.append(v)
+            cells.append(f"{sum(vals) / len(vals):.3f}" if vals else "--")
+        lines.append(f"{bench} & {split} & {len(sub)} & " + " & ".join(cells)
+                     + r" \\")
     lines += [r"\bottomrule", r"\end{tabular}"]
     return "\n".join(lines)
 
@@ -229,10 +239,54 @@ def budget_audit_table(exp_id: str = "main") -> str:
     return "\n".join(lines)
 
 
+COMPACT_POLICIES = ["uniform", "early", "ranked_residual", "ranked_ensemble",
+                    "brace", "brace_combo", "gain_ranked", "oracle_gain", "oracle"]
+
+
+def compact_table(exp_id: str = "main", splits=None) -> str:
+    """Selected policies only: the full grid is in the supplementary table."""
+    rows = read_csv(f"results/tables/{exp_id}_at_budget.csv")
+    agg = read_csv(f"results/tables/{exp_id}_aggregate.csv")
+    splits = splits or [("burgers1d", "test"), ("allencahn1d", "test"),
+                        ("advection2d", "test")]
+    lines = [r"\begin{tabular}{lllrrr}", r"\toprule",
+             r"Benchmark & Split & Policy & $B=0.1$ & $B=0.2$ & $B=0.4$ \\",
+             r"\midrule"]
+    for bench, split in splits:
+        base = [r for r in agg if r["benchmark"] == bench and r["split"] == split
+                and r["policy"] == "neural"]
+        if base:
+            cell = fmt(base[0]["rel_l2_mean"])
+            lines.append(f"{bench} & {split} & surrogate only & "
+                         f"{cell} & {cell} & {cell} \\\\")
+        for pol in COMPACT_POLICIES:
+            cells = []
+            for b in BUDGETS:
+                r = _lookup(rows, bench, split, pol, b)
+                cells.append(f"{fmt(r['rel_l2_mean'])}/{fmt(r['cost_fraction'], 2)}"
+                             if r else "--")
+            if all(c != "--" for c in cells):
+                lines.append(f"{bench} & {split} & {policy_label(pol)} & "
+                             + " & ".join(cells) + r" \\")
+        lines.append(r"\midrule")
+    lines += [r"\bottomrule", r"\end{tabular}"]
+    return "\n".join(lines)
+
+
+def ood_table(exp_id: str = "main") -> str:
+    return compact_table(exp_id, splits=[("burgers1d", "ood_param"),
+                                          ("burgers1d", "ood_ic"),
+                                          ("allencahn1d", "ood_param"),
+                                          ("allencahn1d", "ood_ic"),
+                                          ("advection2d", "ood_param"),
+                                          ("advection2d", "ood_ic")])
+
+
 def main() -> None:
     os.makedirs("paper/tables", exist_ok=True)
     os.makedirs("paper/figures", exist_ok=True)
-    for name, fn in [("main_results", budget_table), ("main_long", main_table),
+    for name, fn in [("main_results", budget_table), ("main_compact", compact_table),
+                     ("ood_compact", ood_table), ("main_long", main_table),
                      ("risk", risk_table), ("paired", paired_table),
                      ("ablation", ablation_table), ("deeponet", deeponet_table),
                      ("budget_audit", budget_audit_table)]:
