@@ -46,9 +46,9 @@ class AdvectionDiffusionSolver:
 
     def step(self, u: np.ndarray, dt: float | None = None) -> np.ndarray:
         dt = self.dt if dt is None else float(dt)
-        uh = np.fft.rfft2(u)
+        uh = np.fft.rfft2(u, axes=(-2, -1))
         symbol = np.exp((-1j * (self.kx * self.cx + self.ky * self.cy) - self.nu * self.k2) * dt)
-        return np.fft.irfft2(uh * symbol, s=u.shape).real
+        return np.fft.irfft2(uh * symbol, s=u.shape[-2:], axes=(-2, -1)).real
 
     def temporal_residual(self, u_prev: np.ndarray, u_next: np.ndarray, dt: float,
                           nu: np.ndarray | float | None = None,
@@ -57,10 +57,10 @@ class AdvectionDiffusionSolver:
         nu = self.nu if nu is None else nu
         cx = self.cx if cx is None else cx
         cy = self.cy if cy is None else cy
-        uh = np.fft.rfft2(u_prev)
-        ux = np.fft.irfft2(1j * self.kx * uh, s=u_prev.shape).real
-        uy = np.fft.irfft2(1j * self.ky * uh, s=u_prev.shape).real
-        lap = np.fft.irfft2(-self.k2 * uh, s=u_prev.shape).real
+        uh = np.fft.rfft2(u_prev, axes=(-2, -1))
+        ux = np.fft.irfft2(1j * self.kx * uh, s=u_prev.shape[-2:], axes=(-2, -1)).real
+        uy = np.fft.irfft2(1j * self.ky * uh, s=u_prev.shape[-2:], axes=(-2, -1)).real
+        lap = np.fft.irfft2(-self.k2 * uh, s=u_prev.shape[-2:], axes=(-2, -1)).real
         return (u_next - u_prev) / dt + cx * ux + cy * uy - nu * lap
 
     def solve(self, u0: np.ndarray, t_end: float = 2.0, save_every: int = 2):

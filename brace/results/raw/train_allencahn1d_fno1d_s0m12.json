@@ -1,0 +1,72 @@
+{
+  "tag": "allencahn1d_fno1d_s0m12",
+  "benchmark": "allencahn1d",
+  "model": "fno1d",
+  "members": [
+    {
+      "member": 0,
+      "seed": 1000,
+      "val_rel_l2": 0.009842134080827236,
+      "val_final_rel_l2": 0.017815634608268738,
+      "train_seconds": 367.456405878067,
+      "epochs": 16,
+      "config": {
+        "benchmark": "allencahn1d",
+        "model": "fno1d",
+        "members": 2,
+        "seed": 1,
+        "epochs": 16,
+        "stride": 2,
+        "batch_size": 32,
+        "lr": 0.002,
+        "width": 32,
+        "modes": 24,
+        "layers": 4,
+        "downsample_to": 0,
+        "tag": "allencahn1d_fno1d_s0m12",
+        "threads": 4
+      }
+    },
+    {
+      "member": 1,
+      "seed": 1001,
+      "val_rel_l2": 0.009891881607472897,
+      "val_final_rel_l2": 0.01788676716387272,
+      "train_seconds": 358.5191969871521,
+      "epochs": 16,
+      "config": {
+        "benchmark": "allencahn1d",
+        "model": "fno1d",
+        "members": 2,
+        "seed": 1,
+        "epochs": 16,
+        "stride": 2,
+        "batch_size": 32,
+        "lr": 0.002,
+        "width": 32,
+        "modes": 24,
+        "layers": 4,
+        "downsample_to": 0,
+        "tag": "allencahn1d_fno1d_s0m12",
+        "threads": 4
+      }
+    }
+  ],
+  "config": {
+    "benchmark": "allencahn1d",
+    "model": "fno1d",
+    "members": 2,
+    "seed": 1,
+    "epochs": 16,
+    "stride": 2,
+    "batch_size": 32,
+    "lr": 0.002,
+    "width": 32,
+    "modes": 24,
+    "layers": 4,
+    "downsample_to": 0,
+    "tag": "allencahn1d_fno1d_s0m12",
+    "threads": 4
+  },
+  "dt_save": 0.009999999776482582
+}

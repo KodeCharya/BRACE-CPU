@@ -26,6 +26,62 @@
         "tag": "allencahn1d_fno1d_s0",
         "threads": 4
       }
+    },
+    {
+      "member": 1,
+      "seed": 1000,
+      "val_rel_l2": 0.009842134080827236,
+      "val_final_rel_l2": 0.017815634608268738,
+      "train_seconds": 367.456405878067,
+      "epochs": 16,
+      "config": {
+        "benchmark": "allencahn1d",
+        "model": "fno1d",
+        "members": 2,
+        "seed": 1,
+        "epochs": 16,
+        "stride": 2,
+        "batch_size": 32,
+        "lr": 0.002,
+        "width": 32,
+        "modes": 24,
+        "layers": 4,
+        "downsample_to": 0,
+        "tag": "allencahn1d_fno1d_s0m12",
+        "threads": 4
+      },
+      "merged_from": {
+        "tag": "allencahn1d_fno1d_s0m12",
+        "member": 0
+      }
+    },
+    {
+      "member": 2,
+      "seed": 1001,
+      "val_rel_l2": 0.009891881607472897,
+      "val_final_rel_l2": 0.01788676716387272,
+      "train_seconds": 358.5191969871521,
+      "epochs": 16,
+      "config": {
+        "benchmark": "allencahn1d",
+        "model": "fno1d",
+        "members": 2,
+        "seed": 1,
+        "epochs": 16,
+        "stride": 2,
+        "batch_size": 32,
+        "lr": 0.002,
+        "width": 32,
+        "modes": 24,
+        "layers": 4,
+        "downsample_to": 0,
+        "tag": "allencahn1d_fno1d_s0m12",
+        "threads": 4
+      },
+      "merged_from": {
+        "tag": "allencahn1d_fno1d_s0m12",
+        "member": 1
+      }
     }
   ],
   "config": {
@@ -45,5 +101,8 @@
     "threads": 4
   },
   "dt_save": 0.01,
-  "notes": "Member 0 was trained first in a longer 24-epoch run. That run's wall-clock was anomalously slow under CPU contention; the process was stopped after member 0. Members 1-2 are trained separately at 16 epochs and appended."
+  "notes": "Member 0 was trained first in a longer 24-epoch run. That run's wall-clock was anomalously slow under CPU contention; the process was stopped after member 0. Members 1-2 are trained separately at 16 epochs and appended.",
+  "merged_members": [
+    "allencahn1d_fno1d_s0m12"
+  ]
 }

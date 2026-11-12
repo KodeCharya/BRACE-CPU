@@ -50,6 +50,19 @@ def test_advection_diffusion_residual_small():
     assert np.abs(r).mean() / scale < 2e-2
 
 
+def test_advection_diffusion_batched_shapes():
+    """The feature pipeline calls both methods with a batch of trajectories."""
+    n, batch = 32, 4
+    rng = np.random.default_rng(5)
+    s = AdvectionDiffusionSolver(n=n, nu=0.02, cx=1.0, cy=0.5, dt=0.005)
+    u = np.stack([grf_2d(n, rng) for _ in range(batch)])
+    out = s.step(u)
+    assert out.shape == u.shape
+    r = s.temporal_residual(u, out, 0.005)
+    assert r.shape == u.shape
+    assert np.all(np.isfinite(r))
+
+
 def test_burgers_energy_decays_and_residual_small():
     rng = np.random.default_rng(0)
     s = BurgersSolver(n=64, nu=0.02, dt=0.001)

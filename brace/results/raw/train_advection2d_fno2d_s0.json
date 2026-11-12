@@ -1,0 +1,72 @@
+{
+  "tag": "advection2d_fno2d_s0",
+  "benchmark": "advection2d",
+  "model": "fno2d",
+  "members": [
+    {
+      "member": 0,
+      "seed": 0,
+      "val_rel_l2": 0.5533375144004822,
+      "val_final_rel_l2": 0.9252088665962219,
+      "train_seconds": 916.6488626003265,
+      "epochs": 12,
+      "config": {
+        "benchmark": "advection2d",
+        "model": "fno2d",
+        "members": 2,
+        "seed": 0,
+        "epochs": 12,
+        "stride": 10,
+        "batch_size": 32,
+        "lr": 0.002,
+        "width": 16,
+        "modes": 8,
+        "layers": 3,
+        "downsample_to": 32,
+        "tag": "advection2d_fno2d_s0",
+        "threads": 4
+      }
+    },
+    {
+      "member": 1,
+      "seed": 1,
+      "val_rel_l2": 0.5454412698745728,
+      "val_final_rel_l2": 0.9152188301086426,
+      "train_seconds": 922.728511095047,
+      "epochs": 12,
+      "config": {
+        "benchmark": "advection2d",
+        "model": "fno2d",
+        "members": 2,
+        "seed": 0,
+        "epochs": 12,
+        "stride": 10,
+        "batch_size": 32,
+        "lr": 0.002,
+        "width": 16,
+        "modes": 8,
+        "layers": 3,
+        "downsample_to": 32,
+        "tag": "advection2d_fno2d_s0",
+        "threads": 4
+      }
+    }
+  ],
+  "config": {
+    "benchmark": "advection2d",
+    "model": "fno2d",
+    "members": 2,
+    "seed": 0,
+    "epochs": 12,
+    "stride": 10,
+    "batch_size": 32,
+    "lr": 0.002,
+    "width": 16,
+    "modes": 8,
+    "layers": 3,
+    "downsample_to": 32,
+    "tag": "advection2d_fno2d_s0",
+    "threads": 4
+  },
+  "dt_save": 0.019999999552965164
+}
