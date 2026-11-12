@@ -21,13 +21,18 @@ from ..solvers.allen_cahn import AllenCahnSolver
 from ..solvers.burgers import BurgersSolver
 
 
-def make_solver(benchmark: str, params: dict, dt_save: float):
+def default_n(benchmark: str) -> int:
+    return {"burgers1d": 128, "allencahn1d": 128, "advection2d": 64}[benchmark]
+
+
+def make_solver(benchmark: str, params: dict, dt_save: float, n: int | None = None):
+    n = default_n(benchmark) if n is None else int(n)
     if benchmark == "burgers1d":
-        return BurgersSolver(n=128, nu=float(params["nu"]), dt=dt_save), dt_save
+        return BurgersSolver(n=n, nu=float(params["nu"]), dt=dt_save), dt_save
     if benchmark == "allencahn1d":
-        return AllenCahnSolver(n=128, eps=float(params["eps"]), dt=dt_save), dt_save
+        return AllenCahnSolver(n=n, eps=float(params["eps"]), dt=dt_save), dt_save
     if benchmark == "advection2d":
-        return AdvectionDiffusionSolver(n=64, nu=float(params["nu"]), cx=float(params["cx"]),
+        return AdvectionDiffusionSolver(n=n, nu=float(params["nu"]), cx=float(params["cx"]),
                                         cy=float(params["cy"]), dt=dt_save), dt_save
     raise ValueError(benchmark)
 
@@ -47,17 +52,19 @@ class Corrector:
         self.solvers = {}
         self.params = params
 
-    def _solver(self, i: int):
-        if i not in self.solvers:
+    def _solver(self, i: int, n: int | None = None):
+        key = (i, n)
+        if key not in self.solvers:
             p = {k: float(v[i]) for k, v in self.params.items() if k in ("nu", "eps", "cx", "cy")}
             # Use the same internal substep as dataset generation so that a
             # "correction" has reference-solver accuracy.
-            self.solvers[i] = make_solver(self.benchmark, p, self.dt_save / self.n_sub)[0]
-        return self.solvers[i]
+            self.solvers[key] = make_solver(self.benchmark, p,
+                                            self.dt_save / self.n_sub, n=n)[0]
+        return self.solvers[key]
 
     def advance(self, u: np.ndarray, i: int, n_intervals: int = 1) -> np.ndarray:
         """Advance state u for n_intervals saved intervals with the reference solver."""
-        s = self._solver(i)
+        s = self._solver(i, u.shape[-1])
         out = np.array(u, copy=True)
         for _ in range(n_intervals * self.n_sub):
             out = s.step(out)

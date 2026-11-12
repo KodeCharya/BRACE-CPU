@@ -60,12 +60,12 @@ def write_csv(path: str, rows: list[dict], fields: list[str]) -> None:
 def aggregate(recs):
     groups = defaultdict(list)
     for r in recs:
-        groups[(r["benchmark"], r["split"], r["policy"], r["budget"])].append(r)
+        groups[(r["benchmark"], r["split"], r.get("variant", ""), r["policy"], r["budget"])].append(r)
     rows = []
-    for (bench, split, policy, budget), rs in sorted(groups.items(),
-                                                     key=lambda kv: (kv[0][0], kv[0][1], kv[0][2], -1 if kv[0][3] is None else kv[0][3])):
+    for (bench, split, variant, policy, budget), rs in sorted(groups.items(),
+                                                     key=lambda kv: (kv[0][0], kv[0][1], kv[0][2], kv[0][3], -1 if kv[0][4] is None else kv[0][4])):
         rows.append({
-            "benchmark": bench, "split": split, "policy": policy,
+            "benchmark": bench, "split": split, "variant": variant, "policy": policy,
             "budget": "" if budget is None else budget,
             "n_seeds": len(rs),
             "rel_l2_mean": float(np.mean([r["rel_l2_mean"] for r in rs])),
@@ -85,12 +85,13 @@ def paired_analysis(recs):
     # index by (bench, split, seed, budget) -> policy -> per-traj means
     idx = defaultdict(dict)
     for r in recs:
-        key = (r["benchmark"], r["split"], r["seed"], r["budget"])
+        key = (r["benchmark"], r["split"], r.get("variant", ""), r["seed"], r["budget"])
         idx[key][r["policy"]] = np.asarray(r["per_traj_mean"])
     rows = []
     for bench in sorted({k[0] for k in idx}):
         for split in sorted({k[1] for k in idx if k[0] == bench}):
-            for budget in sorted({k[3] for k in idx if k[0] == bench and k[1] == split},
+          for variant in sorted({k[2] for k in idx if k[0] == bench and k[1] == split}):
+            for budget in sorted({k[4] for k in idx if k[0] == bench and k[1] == split and k[2] == variant},
                                  key=lambda b: -1 if b is None else b):
                 pairs = [("brace", "neural"), ("brace", "fixed"), ("brace", "ranked_residual"),
                          ("brace", "ranked_calibrated"), ("brace", "adaptive"),
@@ -98,8 +99,8 @@ def paired_analysis(recs):
                          ("neural", "fixed")]
                 for a, b in pairs:
                     diffs, ps, ds = [], [], []
-                    for seed in sorted({k[2] for k in idx if k[0] == bench and k[1] == split and k[3] == budget}):
-                        d = idx[(bench, split, seed, budget)]
+                    for seed in sorted({k[3] for k in idx if k[0] == bench and k[1] == split and k[2] == variant and k[4] == budget}):
+                        d = idx[(bench, split, variant, seed, budget)]
                         if a in d and b in d and len(d[a]) == len(d[b]):
                             st = paired_ci(d[a], d[b])
                             diffs.append(st["mean_diff"])
@@ -108,7 +109,7 @@ def paired_analysis(recs):
                     if diffs:
                         s = summarize_seeds(diffs)
                         rows.append({
-                            "benchmark": bench, "split": split,
+                            "benchmark": bench, "split": split, "variant": variant,
                             "budget": "" if budget is None else budget,
                             "comparison": f"{a} vs {b}",
                             "mean_diff": s["mean"],
@@ -122,7 +123,7 @@ def paired_analysis(recs):
     return rows
 
 
-def plot_results(agg, out_dir="results/figures"):
+def plot_results(agg, exp_id="main", out_dir="results/figures"):
     os.makedirs(out_dir, exist_ok=True)
     for bench in sorted({r["benchmark"] for r in agg}):
         for split in sorted({r["split"] for r in agg if r["benchmark"] == bench}):
@@ -148,11 +149,11 @@ def plot_results(agg, out_dir="results/figures"):
             ax.legend(fontsize=7)
             ax.grid(alpha=0.3)
             fig.tight_layout()
-            fig.savefig(f"{out_dir}/pareto_{bench}_{split}.png", dpi=150)
+            fig.savefig(f"{out_dir}/{exp_id}_pareto_{bench}_{split}.png", dpi=150)
             plt.close(fig)
 
     # Risk-coverage curves per benchmark/split
-    risk = load_risk("main")
+    risk = load_risk(exp_id)
     by = defaultdict(list)
     for b in risk:
         by[(b["benchmark"], b["split"])].append(b)
@@ -179,7 +180,7 @@ def plot_results(agg, out_dir="results/figures"):
         ax.legend(fontsize=7)
         ax.grid(alpha=0.3)
         fig.tight_layout()
-        fig.savefig(f"{out_dir}/risk_coverage_{bench}_{split}.png", dpi=150)
+        fig.savefig(f"{out_dir}/{exp_id}_risk_coverage_{bench}_{split}.png", dpi=150)
         plt.close(fig)
 
     # Reliability diagrams
@@ -207,11 +208,11 @@ def plot_results(agg, out_dir="results/figures"):
         ax.legend(fontsize=8)
         ax.grid(alpha=0.3)
         fig.tight_layout()
-        fig.savefig(f"{out_dir}/reliability_{bench}_{split}.png", dpi=150)
+        fig.savefig(f"{out_dir}/{exp_id}_reliability_{bench}_{split}.png", dpi=150)
         plt.close(fig)
 
     # Long-horizon error curves
-    exp = load_records("main")
+    exp = load_records(exp_id)
     for bench in sorted({r["benchmark"] for r in exp}):
         for split in sorted({r["split"] for r in exp if r["benchmark"] == bench}):
             sub = [r for r in exp if r["benchmark"] == bench and r["split"] == split]
@@ -232,7 +233,7 @@ def plot_results(agg, out_dir="results/figures"):
                 ax.legend(fontsize=7)
                 ax.grid(alpha=0.3)
                 fig.tight_layout()
-                fig.savefig(f"{out_dir}/horizon_{bench}_{split}.png", dpi=150)
+                fig.savefig(f"{out_dir}/{exp_id}_horizon_{bench}_{split}.png", dpi=150)
             plt.close(fig)
 
 
@@ -245,12 +246,12 @@ def main() -> None:
         raise SystemExit(f"no records for exp {args.exp_id}")
     agg = aggregate(recs)
     write_csv(f"results/tables/{args.exp_id}_aggregate.csv", agg,
-              ["benchmark", "split", "policy", "budget", "n_seeds", "rel_l2_mean",
+              ["benchmark", "split", "variant", "policy", "budget", "n_seeds", "rel_l2_mean",
                "rel_l2_ci95", "rel_l2_final", "rel_l2_max", "step_failure_rate",
                "traj_failure_rate", "cost_fraction", "intervention_fraction", "wall_seconds"])
     pairs = paired_analysis(recs)
     write_csv(f"results/tables/{args.exp_id}_paired.csv", pairs,
-              ["benchmark", "split", "budget", "comparison", "mean_diff",
+              ["benchmark", "split", "variant", "budget", "comparison", "mean_diff",
                "ci95_across_seeds", "n_seeds", "cohen_dz_mean", "p_min", "p_max",
                "seeds_sig_005"])
 
@@ -291,7 +292,7 @@ def main() -> None:
         write_csv(f"results/tables/{args.exp_id}_feature_auroc.csv", feat_rows,
                   ["feature", "mean_auroc", "std_auroc", "n"])
 
-    plot_results(agg)
+    plot_results(agg, args.exp_id)
     with open(f"results/processed/{args.exp_id}_summary.json", "w") as f:
         json.dump({"aggregate": agg, "paired": pairs, "risk": rrows}, f, indent=2)
     print(f"aggregated {len(recs)} records -> {len(agg)} groups, {len(pairs)} comparisons")

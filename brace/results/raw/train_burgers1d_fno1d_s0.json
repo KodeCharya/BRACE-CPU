@@ -1,0 +1,92 @@
+{
+  "tag": "burgers1d_fno1d_s0",
+  "benchmark": "burgers1d",
+  "model": "fno1d",
+  "members": [
+    {
+      "member": 0,
+      "seed": 0,
+      "val_rel_l2": 0.07856811583042145,
+      "val_final_rel_l2": 0.09748087078332901,
+      "train_seconds": 1148.063155889511,
+      "epochs": 30,
+      "config": {
+        "benchmark": "burgers1d",
+        "model": "fno1d",
+        "members": 3,
+        "seed": 0,
+        "epochs": 30,
+        "stride": 2,
+        "batch_size": 32,
+        "lr": 0.002,
+        "width": 32,
+        "modes": 32,
+        "layers": 4,
+        "downsample_to": 0,
+        "tag": "burgers1d_fno1d_s0"
+      }
+    },
+    {
+      "member": 1,
+      "seed": 1,
+      "val_rel_l2": 0.077317975461483,
+      "val_final_rel_l2": 0.09736330062150955,
+      "train_seconds": 912.3871178627014,
+      "epochs": 30,
+      "config": {
+        "benchmark": "burgers1d",
+        "model": "fno1d",
+        "members": 3,
+        "seed": 0,
+        "epochs": 30,
+        "stride": 2,
+        "batch_size": 32,
+        "lr": 0.002,
+        "width": 32,
+        "modes": 32,
+        "layers": 4,
+        "downsample_to": 0,
+        "tag": "burgers1d_fno1d_s0"
+      }
+    },
+    {
+      "member": 2,
+      "seed": 2,
+      "val_rel_l2": 0.07546539604663849,
+      "val_final_rel_l2": 0.09492497891187668,
+      "train_seconds": 923.077406167984,
+      "epochs": 30,
+      "config": {
+        "benchmark": "burgers1d",
+        "model": "fno1d",
+        "members": 3,
+        "seed": 0,
+        "epochs": 30,
+        "stride": 2,
+        "batch_size": 32,
+        "lr": 0.002,
+        "width": 32,
+        "modes": 32,
+        "layers": 4,
+        "downsample_to": 0,
+        "tag": "burgers1d_fno1d_s0"
+      }
+    }
+  ],
+  "config": {
+    "benchmark": "burgers1d",
+    "model": "fno1d",
+    "members": 3,
+    "seed": 0,
+    "epochs": 30,
+    "stride": 2,
+    "batch_size": 32,
+    "lr": 0.002,
+    "width": 32,
+    "modes": 32,
+    "layers": 4,
+    "downsample_to": 0,
+    "tag": "burgers1d_fno1d_s0"
+  },
+  "dt_save": 0.019999999552965164
+}

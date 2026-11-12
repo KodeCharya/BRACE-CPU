@@ -21,13 +21,15 @@ from src.uncertainty.pipeline import evaluate_risk_on_split, fit_risk_model, res
 from src.uncertainty.features import FEATURE_NAMES
 
 POLICIES = ["neural", "numerical", "fixed", "adaptive", "ranked_residual",
-            "ranked_ensemble", "ranked_calibrated", "brace", "oracle", "reanchor"]
+            "ranked_ensemble", "ranked_calibrated", "brace", "brace_combo",
+            "oracle", "reanchor"]
 
 SCORE_KIND = {
     "ranked_residual": "residual",
     "ranked_ensemble": "ensemble",
     "ranked_calibrated": "calibrated",
     "brace": "horizon",
+    "brace_combo": "combo",
     "oracle": "oracle",
 }
 
@@ -68,7 +70,7 @@ def load_ensemble(benchmark: str, seed: int, model_name: str = "fno1d", tag: str
 
 
 def _record(policy, budget, res, extra=None):
-    rec = {"policy": policy, "budget": budget}
+    rec = {"policy": policy, "budget": budget, "variant": ""}
     rec.update(res["metrics"])
     rec["wall_seconds"] = res["wall_seconds"]
     rec["intervention_fraction"] = res["intervention_fraction"]
@@ -94,6 +96,7 @@ def main() -> None:
     ap.add_argument("--brace-mode", default="hybrid", choices=["hybrid", "expected", "prob"])
     ap.add_argument("--time-weight", default="none", choices=["none", "early", "late"])
     ap.add_argument("--risk-target", default="step", choices=["step", "horizon"])
+    ap.add_argument("--variant", default="", help="ablation label stored with each record")
     ap.add_argument("--downsample-to", type=int, default=0)
     ap.add_argument("--tau-fail", type=float, default=0.05)
     ap.add_argument("--correction-mode", default="step")
@@ -113,7 +116,7 @@ def main() -> None:
     u_val, p_val = u_val[: args.n_val], {k: v[: args.n_val] for k, v in p_val.items()}
     u_test, p_test = u_test[:n], {k: v[:n] for k, v in p_test.items()}
     T = u_test.shape[1] - 1
-    solver = residual_solver(args.benchmark, dt)
+    solver = residual_solver(args.benchmark, dt, n=u_test.shape[-1])
 
     t0 = time.time()
     mask = None
@@ -152,6 +155,7 @@ def main() -> None:
             actions = np.full((n, T), policy == "numerical", dtype=bool)
             res = execute_actions(models, u_test, actions, args.benchmark, p_test, dt, mode="step")
             rec = _record(policy, None, res)
+            rec["variant"] = args.variant
             records.append(rec)
             print(f"{policy:20s} relL2={rec['rel_l2_mean']:.4f} cost={rec['cost_fraction']:.3f}", flush=True)
             continue
@@ -161,6 +165,7 @@ def main() -> None:
                 res = adaptive_execute(models, u_test, args.benchmark, p_test, dt, B,
                                        "residual", mode="step")
                 rec = _record(policy, B, res)
+                rec["variant"] = args.variant
                 records.append(rec)
                 print(f"{policy:20s} B={B:.2f} relL2={rec['rel_l2_mean']:.4f} "
                       f"cost={rec['cost_fraction']:.3f}", flush=True)
@@ -174,6 +179,7 @@ def main() -> None:
                 res = execute_actions(models, u_test, actions, args.benchmark, p_test, dt,
                                       mode="reanchor")
                 rec = _record(policy, B, res, {"reanchor_step": t_star, "mode": "reanchor"})
+                rec["variant"] = args.variant
                 records.append(rec)
                 print(f"{policy:20s} B={B:.2f} relL2={rec['rel_l2_mean']:.4f} "
                       f"cost={rec['cost_fraction']:.3f} t*={t_star}", flush=True)
@@ -182,42 +188,58 @@ def main() -> None:
         # Static threshold on the raw residual feature, tuned on validation.
         if policy == "fixed":
             scores_val = risk["scores"]["residual"]
+            scores_test = plan_scores(models, u_test, solver, p_test, dt, "residual")
             for B in args.budgets:
                 tau = quantile_threshold(scores_val, B)
-                scores_test = plan_scores(models, u_test, solver, p_test, dt, "residual")
                 actions = threshold_actions(scores_test, tau)
                 res = execute_actions(models, u_test, actions, args.benchmark, p_test, dt)
                 rec = _record(policy, B, res, {"tau": tau})
+                rec["variant"] = args.variant
                 records.append(rec)
                 print(f"{policy:20s} B={B:.2f} relL2={rec['rel_l2_mean']:.4f} "
                       f"cost={rec['cost_fraction']:.3f}", flush=True)
             continue
 
         kind = SCORE_KIND[policy]
+        t_plan = time.time()
+        if kind in ("horizon", "combo"):
+            from src.controller.rollout import neural_pass
+            feats, _ = neural_pass(models, u_test, solver, p_test, dt)
+            hz = risk_hz["risk_model"].risk_score(
+                feats.reshape(-1, feats.shape[-1]), mode=args.brace_mode).reshape(feats.shape[:2])
+            if kind == "combo":
+                # Fixed, a-priori equal-weight fusion of calibrated horizon risk
+                # and ensemble disagreement, standardised on validation scores.
+                hz_key = "brace" if args.brace_mode == "hybrid" else "calibrated"
+                hz_val = np.asarray(risk_hz["scores"][hz_key])
+                ens_val = np.asarray(risk["scores"]["ensemble"])
+                z_hz = (hz - hz_val.mean()) / (hz_val.std() + 1e-8)
+                z_ens = (feats[:, :, 0] - ens_val.mean()) / (ens_val.std() + 1e-8)
+                scores = 0.5 * z_hz + 0.5 * z_ens
+            else:
+                scores = hz
+        else:
+            scores = plan_scores(models, u_test, solver, p_test, dt, kind, risk["risk_model"])
+        if args.time_weight != "none":
+            w = np.linspace(1.0, 0.0, T) if args.time_weight == "early" else np.linspace(0.0, 1.0, T)
+            scores = scores * w[None, :]
         for B in args.budgets:
             t1 = time.time()
-            if kind == "horizon":
-                feats, _ = __import__("src.controller.rollout", fromlist=["neural_pass"]).neural_pass(
-                    models, u_test, solver, p_test, dt)
-                scores = risk_hz["risk_model"].risk_score(
-                    feats.reshape(-1, feats.shape[-1]), mode=args.brace_mode).reshape(feats.shape[:2])
-            else:
-                scores = plan_scores(models, u_test, solver, p_test, dt, kind, risk["risk_model"])
-            if args.time_weight != "none":
-                w = np.linspace(1.0, 0.0, T) if args.time_weight == "early" else np.linspace(0.0, 1.0, T)
-                scores = scores * w[None, :]
             spacing = args.window if args.correction_mode == "window" else 1
             actions = topk_actions(scores, B, cost_per_action=spacing, min_spacing=spacing)
             res = execute_actions(models, u_test, actions, args.benchmark, p_test, dt,
                                   mode=args.correction_mode, window=args.window)
             rec = _record(policy, B, res, {"plan_seconds": time.time() - t1,
                                            "mode": args.correction_mode})
+            rec["variant"] = args.variant
             records.append(rec)
             print(f"{policy:20s} B={B:.2f} relL2={rec['rel_l2_mean']:.4f} "
                   f"cost={rec['cost_fraction']:.3f} fail={rec['step_failure_rate']:.3f}",
                   flush=True)
 
     suffix = args.correction_mode + (f"_w{args.window}" if args.correction_mode == "window" else "")
+    if args.variant:
+        suffix += f"_{args.variant}"
     with open(f"{out_dir}/{args.benchmark}_{args.split}_s{args.seed}_{suffix}.json", "w") as f:
         json.dump({"config": vars(args), "records": records}, f, indent=2)
     print(f"wrote {len(records)} records in {time.time() - t0:.1f}s")

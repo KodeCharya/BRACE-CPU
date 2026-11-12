@@ -32,20 +32,20 @@ def filter_params(benchmark: str, params: dict) -> dict:
     return {k: params[k] for k in keys if k in params}
 
 
-def residual_solver(benchmark: str, dt_save: float):
+def residual_solver(benchmark: str, dt_save: float, n: int | None = None):
     """Solver used only for spatial operators in residual features."""
     if benchmark == "burgers1d":
-        return make_solver(benchmark, {"nu": 0.01}, dt_save)[0]
+        return make_solver(benchmark, {"nu": 0.01}, dt_save, n=n)[0]
     if benchmark == "allencahn1d":
-        return make_solver(benchmark, {"eps": 0.01}, dt_save)[0]
-    return make_solver(benchmark, {"nu": 0.01, "cx": 1.0, "cy": 0.5}, dt_save)[0]
+        return make_solver(benchmark, {"eps": 0.01}, dt_save, n=n)[0]
+    return make_solver(benchmark, {"nu": 0.01, "cx": 1.0, "cy": 0.5}, dt_save, n=n)[0]
 
 
 def fit_risk_model(models, u_val: np.ndarray, benchmark: str, params: dict, dt: float,
                    tau_fail: float = 0.05, alpha: float = 0.1,
                    cal_frac: float = 0.5, mask=None, risk_target: str = "step",
                    gamma: float = 0.95) -> dict:
-    solver = residual_solver(benchmark, dt)
+    solver = residual_solver(benchmark, dt, n=u_val.shape[-1])
     params = filter_params(benchmark, params)
     feats, errs = neural_pass(models, u_val, solver, params, dt)
     n = feats.shape[0]
@@ -91,7 +91,7 @@ def evaluate_risk_on_split(models, u: np.ndarray, benchmark: str, params: dict, 
                            risk: RiskModel, conf: ConformalError, tau_fail: float = 0.05,
                            risk_target: str = "step", gamma: float = 0.95,
                            risk_hz: RiskModel | None = None, conf_hz: ConformalError | None = None) -> dict:
-    solver = residual_solver(benchmark, dt)
+    solver = residual_solver(benchmark, dt, n=u.shape[-1])
     params = filter_params(benchmark, params)
     feats, errs = neural_pass(models, u, solver, params, dt)
     X = feats.reshape(-1, feats.shape[-1])

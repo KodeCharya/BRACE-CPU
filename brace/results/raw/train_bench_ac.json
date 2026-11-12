@@ -1,0 +1,48 @@
+{
+  "tag": "bench_ac",
+  "benchmark": "allencahn1d",
+  "model": "fno1d",
+  "members": [
+    {
+      "member": 0,
+      "seed": 777000,
+      "val_rel_l2": 0.010076778009533882,
+      "val_final_rel_l2": 0.01785142906010151,
+      "train_seconds": 85.68207955360413,
+      "epochs": 1,
+      "config": {
+        "benchmark": "allencahn1d",
+        "model": "fno1d",
+        "members": 1,
+        "seed": 777,
+        "epochs": 1,
+        "stride": 2,
+        "batch_size": 32,
+        "lr": 0.002,
+        "width": 32,
+        "modes": 24,
+        "layers": 4,
+        "downsample_to": 0,
+        "tag": "bench_ac",
+        "threads": 2
+      }
+    }
+  ],
+  "config": {
+    "benchmark": "allencahn1d",
+    "model": "fno1d",
+    "members": 1,
+    "seed": 777,
+    "epochs": 1,
+    "stride": 2,
+    "batch_size": 32,
+    "lr": 0.002,
+    "width": 32,
+    "modes": 24,
+    "layers": 4,
+    "downsample_to": 0,
+    "tag": "bench_ac",
+    "threads": 2
+  },
+  "dt_save": 0.009999999776482582
+}

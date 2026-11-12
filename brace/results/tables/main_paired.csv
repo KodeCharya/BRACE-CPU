@@ -1,0 +1,25 @@
+benchmark,split,variant,budget,comparison,mean_diff,ci95_across_seeds,n_seeds,cohen_dz_mean,p_min,p_max,seeds_sig_005
+burgers1d,test,,0.05,brace vs fixed,-0.0128263,0,1,-0.710833,6.05826e-05,6.05826e-05,1
+burgers1d,test,,0.05,brace vs ranked_residual,-0.00276756,0,1,-0.29582,0.0688713,0.0688713,0
+burgers1d,test,,0.05,brace vs ranked_calibrated,-0.00648528,0,1,-0.660694,0.000159959,0.000159959,1
+burgers1d,test,,0.05,brace vs adaptive,-0.00784587,0,1,-0.626074,0.000308922,0.000308922,1
+burgers1d,test,,0.05,brace vs oracle,-0.00576207,0,1,-0.471336,0.00492916,0.00492916,1
+burgers1d,test,,0.05,ranked_residual vs fixed,-0.0100588,0,1,-0.593391,0.0005688,0.0005688,1
+burgers1d,test,,0.1,brace vs fixed,-0.0140361,0,1,-0.584319,0.000672415,0.000672415,1
+burgers1d,test,,0.1,brace vs ranked_residual,-0.00335056,0,1,-0.278363,0.0861602,0.0861602,0
+burgers1d,test,,0.1,brace vs ranked_calibrated,-0.00801604,0,1,-0.745975,3.03673e-05,3.03673e-05,1
+burgers1d,test,,0.1,brace vs adaptive,-0.00784982,0,1,-0.539862,0.00150471,0.00150471,1
+burgers1d,test,,0.1,brace vs oracle,-0.00819606,0,1,-0.588752,0.000619687,0.000619687,1
+burgers1d,test,,0.1,ranked_residual vs fixed,-0.0106856,0,1,-0.443266,0.00783759,0.00783759,1
+burgers1d,test,,0.2,brace vs fixed,-0.0154124,0,1,-0.568864,0.000892238,0.000892238,1
+burgers1d,test,,0.2,brace vs ranked_residual,-0.00380641,0,1,-0.275793,0.0889904,0.0889904,0
+burgers1d,test,,0.2,brace vs ranked_calibrated,-0.0105765,0,1,-0.890832,1.66858e-06,1.66858e-06,1
+burgers1d,test,,0.2,brace vs adaptive,-0.0059365,0,1,-0.488071,0.00371435,0.00371435,1
+burgers1d,test,,0.2,brace vs oracle,-0.0107104,0,1,-0.643599,0.000221691,0.000221691,1
+burgers1d,test,,0.2,ranked_residual vs fixed,-0.0116059,0,1,-0.430187,0.00968063,0.00968063,1
+burgers1d,test,,0.4,brace vs fixed,-0.0047893,0,1,-0.297354,0.0675046,0.0675046,0
+burgers1d,test,,0.4,brace vs ranked_residual,-0.00617585,0,1,-0.454853,0.00648316,0.00648316,1
+burgers1d,test,,0.4,brace vs ranked_calibrated,-0.0141614,0,1,-1.40594,6.38136e-11,6.38136e-11,1
+burgers1d,test,,0.4,brace vs adaptive,-0.00525623,0,1,-0.417814,0.011786,0.011786,1
+burgers1d,test,,0.4,brace vs oracle,-0.0139249,0,1,-0.943699,5.72834e-07,5.72834e-07,1
+burgers1d,test,,0.4,ranked_residual vs fixed,0.00138655,0,1,0.0662491,0.677518,0.677518,0

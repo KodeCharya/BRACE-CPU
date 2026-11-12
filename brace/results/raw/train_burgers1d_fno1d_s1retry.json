@@ -1,0 +1,48 @@
+{
+  "tag": "burgers1d_fno1d_s1retry",
+  "benchmark": "burgers1d",
+  "model": "fno1d",
+  "members": [
+    {
+      "member": 0,
+      "seed": 5000000,
+      "val_rel_l2": 0.07334329187870026,
+      "val_final_rel_l2": 0.09067665040493011,
+      "train_seconds": 1926.3595900535583,
+      "epochs": 30,
+      "config": {
+        "benchmark": "burgers1d",
+        "model": "fno1d",
+        "members": 1,
+        "seed": 5000,
+        "epochs": 30,
+        "stride": 2,
+        "batch_size": 32,
+        "lr": 0.002,
+        "width": 32,
+        "modes": 32,
+        "layers": 4,
+        "downsample_to": 0,
+        "tag": "burgers1d_fno1d_s1retry",
+        "threads": 2
+      }
+    }
+  ],
+  "config": {
+    "benchmark": "burgers1d",
+    "model": "fno1d",
+    "members": 1,
+    "seed": 5000,
+    "epochs": 30,
+    "stride": 2,
+    "batch_size": 32,
+    "lr": 0.002,
+    "width": 32,
+    "modes": 32,
+    "layers": 4,
+    "downsample_to": 0,
+    "tag": "burgers1d_fno1d_s1retry",
+    "threads": 2
+  },
+  "dt_save": 0.019999999552965164
+}

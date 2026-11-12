@@ -85,11 +85,11 @@ def main() -> None:
             "val40": ["--n-val", "40"],
         }
         for name, extra in variants.items():
-            out = f"results/raw/ablation/{name}_test_s0_step.json"
+            out = f"results/raw/ablation/burgers1d_test_s0_step_{name}.json"
             if os.path.exists(out):
                 continue
             cmd = [PY, "scripts/run_experiments.py", "--benchmark", "burgers1d",
-                   "--split", "test", "--exp-id", "ablation", *base, *extra]
+                   "--split", "test", "--exp-id", "ablation", "--variant", name, *base, *extra]
             run(cmd, "results/raw/orchestrator.log", skip_if=out)
 
     if args.phase in ("correction", "all"):
