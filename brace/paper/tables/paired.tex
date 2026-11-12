@@ -1,0 +1,58 @@
+\begin{tabular}{llllrrrr}
+\toprule
+Benchmark & Split & $B$ & Comparison & $\Delta$ & 95\% CI & $d_z$ & sig. \\
+\midrule
+burgers1d & test & 0.05 & brace vs fixed & -0.013 & 0.002 & -0.77 & 2/2 \\
+burgers1d & test & 0.05 & brace vs ranked_calibrated & -0.006 & 0.004 & -0.64 & 2/2 \\
+burgers1d & test & 0.05 & brace vs adaptive & -0.008 & 0.007 & -0.65 & 2/2 \\
+burgers1d & test & 0.05 & brace vs ranked_ensemble & -0.000 & 0.002 & -0.06 & 0/2 \\
+burgers1d & test & 0.1 & brace vs fixed & -0.015 & 0.014 & -0.65 & 2/2 \\
+burgers1d & test & 0.1 & brace vs ranked_calibrated & -0.008 & 0.006 & -0.71 & 2/2 \\
+burgers1d & test & 0.1 & brace vs adaptive & -0.008 & 0.003 & -0.57 & 2/2 \\
+burgers1d & test & 0.1 & brace vs ranked_ensemble & 0.001 & 0.004 & 0.16 & 0/2 \\
+burgers1d & test & 0.2 & brace vs fixed & -0.015 & 0.002 & -0.60 & 2/2 \\
+burgers1d & test & 0.2 & brace vs ranked_calibrated & -0.010 & 0.013 & -0.87 & 2/2 \\
+burgers1d & test & 0.2 & brace vs adaptive & -0.006 & 0.004 & -0.56 & 2/2 \\
+burgers1d & test & 0.2 & brace vs ranked_ensemble & 0.002 & 0.009 & 0.35 & 1/2 \\
+burgers1d & test & 0.4 & brace vs fixed & -0.005 & 0.003 & -0.30 & 0/2 \\
+burgers1d & test & 0.4 & brace vs ranked_calibrated & -0.012 & 0.024 & -1.26 & 2/2 \\
+burgers1d & test & 0.4 & brace vs adaptive & -0.004 & 0.013 & -0.34 & 1/2 \\
+burgers1d & test & 0.4 & brace vs ranked_ensemble & 0.003 & 0.002 & 0.43 & 2/2 \\
+burgers1d & ood_param & 0.1 & brace vs fixed & -0.028 & 0.020 & -1.35 & 2/2 \\
+burgers1d & ood_param & 0.1 & brace vs ranked_calibrated & -0.026 & 0.018 & -1.91 & 2/2 \\
+burgers1d & ood_param & 0.1 & brace vs adaptive & -0.018 & 0.017 & -1.38 & 2/2 \\
+burgers1d & ood_param & 0.1 & brace vs ranked_ensemble & 0.002 & 0.003 & 0.22 & 0/2 \\
+burgers1d & ood_param & 0.1 & brace_combo vs brace & -0.001 & 0.001 & -0.26 & 0/2 \\
+burgers1d & ood_param & 0.1 & brace_combo vs ranked_ensemble & 0.001 & 0.002 & 0.14 & 0/2 \\
+burgers1d & ood_param & 0.2 & brace vs fixed & -0.038 & 0.032 & -1.04 & 2/2 \\
+burgers1d & ood_param & 0.2 & brace vs ranked_calibrated & -0.042 & 0.026 & -2.21 & 2/2 \\
+burgers1d & ood_param & 0.2 & brace vs adaptive & -0.025 & 0.026 & -1.20 & 2/2 \\
+burgers1d & ood_param & 0.2 & brace vs ranked_ensemble & 0.002 & 0.003 & 0.17 & 0/2 \\
+burgers1d & ood_param & 0.2 & brace_combo vs brace & -0.003 & 0.005 & -0.30 & 0/2 \\
+burgers1d & ood_param & 0.2 & brace_combo vs ranked_ensemble & -0.000 & 0.002 & -0.01 & 0/2 \\
+burgers1d & ood_param & 0.4 & brace vs fixed & -0.045 & 0.047 & -0.82 & 2/2 \\
+burgers1d & ood_param & 0.4 & brace vs ranked_calibrated & -0.070 & 0.014 & -2.15 & 2/2 \\
+burgers1d & ood_param & 0.4 & brace vs adaptive & -0.045 & 0.030 & -1.14 & 2/2 \\
+burgers1d & ood_param & 0.4 & brace vs ranked_ensemble & 0.008 & 0.018 & 0.34 & 1/2 \\
+burgers1d & ood_param & 0.4 & brace_combo vs brace & -0.006 & 0.010 & -0.53 & 1/2 \\
+burgers1d & ood_param & 0.4 & brace_combo vs ranked_ensemble & 0.002 & 0.028 & 0.09 & 0/2 \\
+burgers1d & ood_ic & 0.1 & brace vs fixed & 0.029 & 0.000 & 0.57 & 1/1 \\
+burgers1d & ood_ic & 0.1 & brace vs ranked_calibrated & -0.002 & 0.000 & -0.18 & 0/1 \\
+burgers1d & ood_ic & 0.1 & brace vs adaptive & -0.005 & 0.000 & -0.27 & 0/1 \\
+burgers1d & ood_ic & 0.1 & brace vs ranked_ensemble & 0.007 & 0.000 & 0.33 & 0/1 \\
+burgers1d & ood_ic & 0.1 & brace_combo vs brace & -0.001 & 0.000 & -0.22 & 0/1 \\
+burgers1d & ood_ic & 0.1 & brace_combo vs ranked_ensemble & 0.006 & 0.000 & 0.28 & 0/1 \\
+burgers1d & ood_ic & 0.2 & brace vs fixed & 0.022 & 0.000 & 0.52 & 1/1 \\
+burgers1d & ood_ic & 0.2 & brace vs ranked_calibrated & -0.004 & 0.000 & -0.40 & 1/1 \\
+burgers1d & ood_ic & 0.2 & brace vs adaptive & -0.006 & 0.000 & -0.27 & 0/1 \\
+burgers1d & ood_ic & 0.2 & brace vs ranked_ensemble & 0.007 & 0.000 & 0.32 & 0/1 \\
+burgers1d & ood_ic & 0.2 & brace_combo vs brace & -0.001 & 0.000 & -0.24 & 0/1 \\
+burgers1d & ood_ic & 0.2 & brace_combo vs ranked_ensemble & 0.006 & 0.000 & 0.29 & 0/1 \\
+burgers1d & ood_ic & 0.4 & brace vs fixed & 0.028 & 0.000 & 1.07 & 1/1 \\
+burgers1d & ood_ic & 0.4 & brace vs ranked_calibrated & -0.006 & 0.000 & -0.66 & 1/1 \\
+burgers1d & ood_ic & 0.4 & brace vs adaptive & 0.010 & 0.000 & 0.40 & 1/1 \\
+burgers1d & ood_ic & 0.4 & brace vs ranked_ensemble & 0.014 & 0.000 & 0.62 & 1/1 \\
+burgers1d & ood_ic & 0.4 & brace_combo vs brace & -0.006 & 0.000 & -0.90 & 1/1 \\
+burgers1d & ood_ic & 0.4 & brace_combo vs ranked_ensemble & 0.008 & 0.000 & 0.45 & 1/1 \\
+\bottomrule
+\end{tabular}

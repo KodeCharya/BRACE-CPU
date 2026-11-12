@@ -1,0 +1,38 @@
+\begin{tabular}{lllrrr}
+\toprule
+Benchmark & Split & Policy & $B=0.1$ & $B=0.2$ & $B=0.4$ \\
+\midrule
+burgers1d & test & surrogate only & 0.061/0.00 & 0.061/0.00 & 0.061/0.00 \\
+burgers1d & test & fixed & 0.055/0.12 & 0.047/0.22 & 0.026/0.48 \\
+burgers1d & test & adaptive & 0.048/0.06 & 0.038/0.12 & 0.026/0.27 \\
+burgers1d & test & residual-ranked & 0.043/0.10 & 0.036/0.20 & 0.027/0.40 \\
+burgers1d & test & ensemble-ranked & 0.039/0.10 & 0.030/0.20 & 0.019/0.40 \\
+burgers1d & test & calib.-ranked & 0.047/0.10 & 0.042/0.20 & 0.034/0.40 \\
+burgers1d & test & BRACE & 0.040/0.10 & 0.032/0.20 & 0.021/0.40 \\
+burgers1d & test & oracle & 0.048/0.10 & 0.043/0.20 & 0.035/0.40 \\
+burgers1d & test & reanchor & 0.056/0.10 & 0.046/0.20 & 0.034/0.40 \\
+\midrule
+burgers1d & ood_param & surrogate only & 0.220/0.00 & 0.220/0.00 & 0.220/0.00 \\
+burgers1d & ood_param & fixed & 0.214/0.05 & 0.201/0.15 & 0.161/0.39 \\
+burgers1d & ood_param & adaptive & 0.204/0.06 & 0.188/0.13 & 0.161/0.30 \\
+burgers1d & ood_param & residual-ranked & 0.195/0.10 & 0.180/0.20 & 0.151/0.40 \\
+burgers1d & ood_param & ensemble-ranked & 0.184/0.10 & 0.160/0.20 & 0.108/0.40 \\
+burgers1d & ood_param & calib.-ranked & 0.212/0.10 & 0.204/0.20 & 0.186/0.40 \\
+burgers1d & ood_param & BRACE & 0.186/0.10 & 0.163/0.20 & 0.116/0.40 \\
+burgers1d & ood_param & BRACE-fusion & 0.185/0.10 & 0.160/0.20 & 0.110/0.40 \\
+burgers1d & ood_param & oracle & 0.212/0.10 & 0.206/0.20 & 0.194/0.40 \\
+burgers1d & ood_param & reanchor & 0.213/0.10 & 0.194/0.20 & 0.167/0.40 \\
+\midrule
+burgers1d & ood_ic & surrogate only & 0.175/0.00 & 0.175/0.00 & 0.175/0.00 \\
+burgers1d & ood_ic & fixed & 0.108/0.40 & 0.092/0.52 & 0.061/0.71 \\
+burgers1d & ood_ic & adaptive & 0.142/0.08 & 0.119/0.16 & 0.079/0.34 \\
+burgers1d & ood_ic & residual-ranked & 0.148/0.10 & 0.130/0.20 & 0.100/0.40 \\
+burgers1d & ood_ic & ensemble-ranked & 0.130/0.10 & 0.106/0.20 & 0.076/0.40 \\
+burgers1d & ood_ic & calib.-ranked & 0.139/0.10 & 0.117/0.20 & 0.096/0.40 \\
+burgers1d & ood_ic & BRACE & 0.137/0.10 & 0.113/0.20 & 0.089/0.40 \\
+burgers1d & ood_ic & BRACE-fusion & 0.136/0.10 & 0.112/0.20 & 0.084/0.40 \\
+burgers1d & ood_ic & oracle & 0.155/0.10 & 0.140/0.20 & 0.115/0.40 \\
+burgers1d & ood_ic & reanchor & 0.158/0.10 & 0.136/0.20 & 0.108/0.40 \\
+\midrule
+\bottomrule
+\end{tabular}

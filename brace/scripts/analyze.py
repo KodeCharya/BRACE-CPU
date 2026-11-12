@@ -368,14 +368,15 @@ def summary_at_budget(agg, exp_id: str):
     """Compact per-benchmark comparison at each declared budget."""
     rows = []
     for r in agg:
-        if r.get("variant", "") != "" or r["budget"] == "":
+        if r["budget"] == "":
             continue
-        rows.append({k: r[k] for k in ("benchmark", "split", "policy", "budget", "n_seeds",
-                                       "rel_l2_mean", "rel_l2_seed_min", "rel_l2_seed_max",
-                                       "rel_l2_ci95", "cost_fraction", "step_failure_rate",
-                                       "correction_gain_mean", "correction_harm_rate")})
+        rows.append({"variant": r.get("variant", ""),
+                     **{k: r[k] for k in ("benchmark", "split", "policy", "budget", "n_seeds",
+                                          "rel_l2_mean", "rel_l2_seed_min", "rel_l2_seed_max",
+                                          "rel_l2_ci95", "cost_fraction", "step_failure_rate",
+                                          "correction_gain_mean", "correction_harm_rate")}})
     write_csv(f"results/tables/{exp_id}_at_budget.csv", rows,
-              ["benchmark", "split", "policy", "budget", "n_seeds", "rel_l2_mean",
+              ["benchmark", "split", "variant", "policy", "budget", "n_seeds", "rel_l2_mean",
                "rel_l2_seed_min", "rel_l2_seed_max", "rel_l2_ci95", "cost_fraction",
                "step_failure_rate", "correction_gain_mean", "correction_harm_rate"])
 
