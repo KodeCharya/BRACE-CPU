@@ -38,8 +38,8 @@ def main() -> None:
     deep = read_csv("results/tables/deeponet_at_budget.csv")
 
     digest = {"main": {}, "best_at_budget": {}, "budget_fidelity": {},
-              "risk": {}, "paired": {}, "ablation": {}, "correction_mode": {},
-              "correction_gain": {}, "deeponet": {}}
+              "budget_violations": {}, "risk": {}, "paired": {}, "ablation": {},
+              "correction_mode": {}, "correction_gain": {}, "deeponet": {}}
 
     # Main table, keyed by benchmark/split/policy/budget.
     for r in main_rows:
@@ -71,6 +71,28 @@ def main() -> None:
             continue
         digest["budget_fidelity"][f"{r['benchmark']}|{r['split']}|{r['policy']}|{r['budget']}"] = {
             "declared": b, "realised": c, "delta": c - b}
+
+    # Budget-violation audit. A policy that declares B but spends more than
+    # B + tol is not budget-aware; one that spends far less is not using the
+    # budget it was given. Both are reported rather than hidden.
+    tol = 0.02
+    viol = {}
+    for r in main_rows:
+        c, b = fnum(r["cost_fraction"]), fnum(r["budget"])
+        if c is None or b is None:
+            continue
+        pol = r["policy"]
+        v = viol.setdefault(pol, {"over": 0, "under": 0, "n": 0, "max_delta": 0.0,
+                                  "min_delta": 0.0})
+        v["n"] += 1
+        d = c - b
+        v["max_delta"] = max(v["max_delta"], d)
+        v["min_delta"] = min(v["min_delta"], d)
+        if d > tol:
+            v["over"] += 1
+        if -d > tol:
+            v["under"] += 1
+    digest["budget_violations"] = viol
 
     for r in risk_rows:
         digest["risk"][f"{r['benchmark']}|{r['split']}|{r['seed']}"] = {
@@ -112,6 +134,12 @@ def main() -> None:
         lines.append(f"  {r['benchmark']:12s} {r['split']:9s} {r['policy']:18s} "
                      f"B={r['budget']:>4s}  {fnum(r['rel_l2_mean']):.4f} / "
                      f"{fnum(r['cost_fraction']):.3f}")
+    lines.append("")
+    lines.append("Budget audit (declared vs realised cost, tol=0.02):")
+    for pol, v in sorted(viol.items()):
+        lines.append(f"  {pol:18s} n={v['n']:3d}  overspent={v['over']:3d}  "
+                     f"underspent={v['under']:3d}  delta range="
+                     f"[{v['min_delta']:+.3f}, {v['max_delta']:+.3f}]")
     lines.append("")
     lines.append("Risk (in-distribution and shifted):")
     for r in risk_rows:

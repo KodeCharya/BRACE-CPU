@@ -1,0 +1,236 @@
+BRACE results digest
+====================
+
+Main results (rel-L2 / realised cost):
+  allencahn1d  ood_ic    adaptive           B= 0.1  0.0154 / 0.053
+  allencahn1d  ood_ic    adaptive           B= 0.2  0.0153 / 0.106
+  allencahn1d  ood_ic    adaptive           B= 0.4  0.0151 / 0.178
+  allencahn1d  ood_ic    brace              B= 0.1  0.0102 / 0.100
+  allencahn1d  ood_ic    brace              B= 0.2  0.0069 / 0.200
+  allencahn1d  ood_ic    brace              B= 0.4  0.0036 / 0.400
+  allencahn1d  ood_ic    brace_combo        B= 0.1  0.0102 / 0.100
+  allencahn1d  ood_ic    brace_combo        B= 0.2  0.0068 / 0.200
+  allencahn1d  ood_ic    brace_combo        B= 0.4  0.0035 / 0.400
+  allencahn1d  ood_ic    early              B= 0.1  0.0099 / 0.100
+  allencahn1d  ood_ic    early              B= 0.2  0.0068 / 0.200
+  allencahn1d  ood_ic    early              B= 0.4  0.0034 / 0.400
+  allencahn1d  ood_ic    fixed              B= 0.1  0.0012 / 0.751
+  allencahn1d  ood_ic    fixed              B= 0.2  0.0005 / 0.890
+  allencahn1d  ood_ic    fixed              B= 0.4  0.0001 / 0.963
+  allencahn1d  ood_ic    oracle             B= 0.1  0.0136 / 0.100
+  allencahn1d  ood_ic    oracle             B= 0.2  0.0120 / 0.200
+  allencahn1d  ood_ic    oracle             B= 0.4  0.0092 / 0.400
+  allencahn1d  ood_ic    ranked_calibrated  B= 0.1  0.0113 / 0.100
+  allencahn1d  ood_ic    ranked_calibrated  B= 0.2  0.0083 / 0.200
+  allencahn1d  ood_ic    ranked_calibrated  B= 0.4  0.0048 / 0.400
+  allencahn1d  ood_ic    ranked_ensemble    B= 0.1  0.0099 / 0.100
+  allencahn1d  ood_ic    ranked_ensemble    B= 0.2  0.0068 / 0.200
+  allencahn1d  ood_ic    ranked_ensemble    B= 0.4  0.0035 / 0.400
+  allencahn1d  ood_ic    ranked_residual    B= 0.1  0.0101 / 0.100
+  allencahn1d  ood_ic    ranked_residual    B= 0.2  0.0071 / 0.200
+  allencahn1d  ood_ic    ranked_residual    B= 0.4  0.0039 / 0.400
+  allencahn1d  ood_ic    reanchor           B= 0.1  0.0106 / 0.100
+  allencahn1d  ood_ic    reanchor           B= 0.2  0.0088 / 0.200
+  allencahn1d  ood_ic    reanchor           B= 0.4  0.0090 / 0.400
+  allencahn1d  ood_ic    uniform            B= 0.1  0.0134 / 0.100
+  allencahn1d  ood_ic    uniform            B= 0.2  0.0116 / 0.200
+  allencahn1d  ood_ic    uniform            B= 0.4  0.0083 / 0.400
+  allencahn1d  ood_param adaptive           B= 0.1  0.0302 / 0.095
+  allencahn1d  ood_param adaptive           B= 0.2  0.0278 / 0.198
+  allencahn1d  ood_param adaptive           B= 0.4  0.0233 / 0.384
+  allencahn1d  ood_param brace              B= 0.1  0.0297 / 0.100
+  allencahn1d  ood_param brace              B= 0.2  0.0269 / 0.200
+  allencahn1d  ood_param brace              B= 0.4  0.0207 / 0.400
+  allencahn1d  ood_param brace_combo        B= 0.1  0.0283 / 0.100
+  allencahn1d  ood_param brace_combo        B= 0.2  0.0243 / 0.200
+  allencahn1d  ood_param brace_combo        B= 0.4  0.0166 / 0.400
+  allencahn1d  ood_param early              B= 0.1  0.0265 / 0.100
+  allencahn1d  ood_param early              B= 0.2  0.0212 / 0.200
+  allencahn1d  ood_param early              B= 0.4  0.0123 / 0.400
+  allencahn1d  ood_param fixed              B= 0.1  0.0054 / 0.744
+  allencahn1d  ood_param fixed              B= 0.2  0.0018 / 0.899
+  allencahn1d  ood_param fixed              B= 0.4  0.0000 / 1.000
+  allencahn1d  ood_param oracle             B= 0.1  0.0320 / 0.100
+  allencahn1d  ood_param oracle             B= 0.2  0.0311 / 0.200
+  allencahn1d  ood_param oracle             B= 0.4  0.0274 / 0.400
+  allencahn1d  ood_param ranked_calibrated  B= 0.1  0.0320 / 0.100
+  allencahn1d  ood_param ranked_calibrated  B= 0.2  0.0311 / 0.200
+  allencahn1d  ood_param ranked_calibrated  B= 0.4  0.0274 / 0.400
+  allencahn1d  ood_param ranked_ensemble    B= 0.1  0.0265 / 0.100
+  allencahn1d  ood_param ranked_ensemble    B= 0.2  0.0212 / 0.200
+  allencahn1d  ood_param ranked_ensemble    B= 0.4  0.0123 / 0.400
+  allencahn1d  ood_param ranked_residual    B= 0.1  0.0305 / 0.100
+  allencahn1d  ood_param ranked_residual    B= 0.2  0.0286 / 0.200
+  allencahn1d  ood_param ranked_residual    B= 0.4  0.0236 / 0.400
+  allencahn1d  ood_param reanchor           B= 0.1  0.0268 / 0.100
+  allencahn1d  ood_param reanchor           B= 0.2  0.0226 / 0.200
+  allencahn1d  ood_param reanchor           B= 0.4  0.0179 / 0.400
+  allencahn1d  ood_param uniform            B= 0.1  0.0293 / 0.100
+  allencahn1d  ood_param uniform            B= 0.2  0.0262 / 0.200
+  allencahn1d  ood_param uniform            B= 0.4  0.0199 / 0.400
+  allencahn1d  test      adaptive           B=0.05  0.0072 / 0.050
+  allencahn1d  test      adaptive           B= 0.1  0.0069 / 0.099
+  allencahn1d  test      adaptive           B= 0.2  0.0062 / 0.206
+  allencahn1d  test      adaptive           B= 0.4  0.0049 / 0.405
+  allencahn1d  test      brace              B=0.05  0.0071 / 0.050
+  allencahn1d  test      brace              B= 0.1  0.0067 / 0.100
+  allencahn1d  test      brace              B= 0.2  0.0059 / 0.200
+  allencahn1d  test      brace              B= 0.4  0.0043 / 0.400
+  allencahn1d  test      brace_combo        B=0.05  0.0070 / 0.050
+  allencahn1d  test      brace_combo        B= 0.1  0.0064 / 0.100
+  allencahn1d  test      brace_combo        B= 0.2  0.0053 / 0.200
+  allencahn1d  test      brace_combo        B= 0.4  0.0033 / 0.400
+  allencahn1d  test      early              B=0.05  0.0068 / 0.050
+  allencahn1d  test      early              B= 0.1  0.0062 / 0.100
+  allencahn1d  test      early              B= 0.2  0.0050 / 0.200
+  allencahn1d  test      early              B= 0.4  0.0029 / 0.400
+  allencahn1d  test      fixed              B=0.05  0.0066 / 0.055
+  allencahn1d  test      fixed              B= 0.1  0.0061 / 0.088
+  allencahn1d  test      fixed              B= 0.2  0.0052 / 0.162
+  allencahn1d  test      fixed              B= 0.4  0.0035 / 0.311
+  allencahn1d  test      oracle             B=0.05  0.0075 / 0.050
+  allencahn1d  test      oracle             B= 0.1  0.0074 / 0.100
+  allencahn1d  test      oracle             B= 0.2  0.0072 / 0.200
+  allencahn1d  test      oracle             B= 0.4  0.0062 / 0.400
+  allencahn1d  test      ranked_calibrated  B=0.05  0.0075 / 0.050
+  allencahn1d  test      ranked_calibrated  B= 0.1  0.0074 / 0.100
+  allencahn1d  test      ranked_calibrated  B= 0.2  0.0072 / 0.200
+  allencahn1d  test      ranked_calibrated  B= 0.4  0.0062 / 0.400
+  allencahn1d  test      ranked_ensemble    B=0.05  0.0068 / 0.050
+  allencahn1d  test      ranked_ensemble    B= 0.1  0.0062 / 0.100
+  allencahn1d  test      ranked_ensemble    B= 0.2  0.0050 / 0.200
+  allencahn1d  test      ranked_ensemble    B= 0.4  0.0029 / 0.400
+  allencahn1d  test      ranked_residual    B=0.05  0.0074 / 0.050
+  allencahn1d  test      ranked_residual    B= 0.1  0.0073 / 0.100
+  allencahn1d  test      ranked_residual    B= 0.2  0.0070 / 0.200
+  allencahn1d  test      ranked_residual    B= 0.4  0.0059 / 0.400
+  allencahn1d  test      reanchor           B=0.05  0.0069 / 0.050
+  allencahn1d  test      reanchor           B= 0.1  0.0063 / 0.100
+  allencahn1d  test      reanchor           B= 0.2  0.0053 / 0.200
+  allencahn1d  test      reanchor           B= 0.4  0.0042 / 0.400
+  allencahn1d  test      uniform            B=0.05  0.0072 / 0.050
+  allencahn1d  test      uniform            B= 0.1  0.0068 / 0.100
+  allencahn1d  test      uniform            B= 0.2  0.0060 / 0.200
+  allencahn1d  test      uniform            B= 0.4  0.0045 / 0.400
+  burgers1d    ood_ic    adaptive           B= 0.1  0.1423 / 0.077
+  burgers1d    ood_ic    adaptive           B= 0.2  0.1193 / 0.161
+  burgers1d    ood_ic    adaptive           B= 0.4  0.0791 / 0.339
+  burgers1d    ood_ic    brace              B= 0.1  0.1371 / 0.100
+  burgers1d    ood_ic    brace              B= 0.2  0.1133 / 0.200
+  burgers1d    ood_ic    brace              B= 0.4  0.0894 / 0.400
+  burgers1d    ood_ic    brace_combo        B= 0.1  0.1362 / 0.100
+  burgers1d    ood_ic    brace_combo        B= 0.2  0.1120 / 0.200
+  burgers1d    ood_ic    brace_combo        B= 0.4  0.0836 / 0.400
+  burgers1d    ood_ic    fixed              B= 0.1  0.1078 / 0.399
+  burgers1d    ood_ic    fixed              B= 0.2  0.0916 / 0.523
+  burgers1d    ood_ic    fixed              B= 0.4  0.0612 / 0.714
+  burgers1d    ood_ic    oracle             B= 0.1  0.1547 / 0.100
+  burgers1d    ood_ic    oracle             B= 0.2  0.1395 / 0.200
+  burgers1d    ood_ic    oracle             B= 0.4  0.1155 / 0.400
+  burgers1d    ood_ic    ranked_calibrated  B= 0.1  0.1386 / 0.100
+  burgers1d    ood_ic    ranked_calibrated  B= 0.2  0.1173 / 0.200
+  burgers1d    ood_ic    ranked_calibrated  B= 0.4  0.0959 / 0.400
+  burgers1d    ood_ic    ranked_ensemble    B= 0.1  0.1300 / 0.100
+  burgers1d    ood_ic    ranked_ensemble    B= 0.2  0.1062 / 0.200
+  burgers1d    ood_ic    ranked_ensemble    B= 0.4  0.0756 / 0.400
+  burgers1d    ood_ic    ranked_residual    B= 0.1  0.1477 / 0.100
+  burgers1d    ood_ic    ranked_residual    B= 0.2  0.1303 / 0.200
+  burgers1d    ood_ic    ranked_residual    B= 0.4  0.0996 / 0.400
+  burgers1d    ood_ic    reanchor           B= 0.1  0.1584 / 0.100
+  burgers1d    ood_ic    reanchor           B= 0.2  0.1361 / 0.200
+  burgers1d    ood_ic    reanchor           B= 0.4  0.1078 / 0.400
+  burgers1d    ood_param adaptive           B= 0.1  0.2038 / 0.059
+  burgers1d    ood_param adaptive           B= 0.2  0.1876 / 0.132
+  burgers1d    ood_param adaptive           B= 0.4  0.1611 / 0.298
+  burgers1d    ood_param brace              B= 0.1  0.1860 / 0.100
+  burgers1d    ood_param brace              B= 0.2  0.1626 / 0.200
+  burgers1d    ood_param brace              B= 0.4  0.1161 / 0.400
+  burgers1d    ood_param brace_combo        B= 0.1  0.1848 / 0.100
+  burgers1d    ood_param brace_combo        B= 0.2  0.1601 / 0.200
+  burgers1d    ood_param brace_combo        B= 0.4  0.1100 / 0.400
+  burgers1d    ood_param fixed              B= 0.1  0.2140 / 0.050
+  burgers1d    ood_param fixed              B= 0.2  0.2009 / 0.152
+  burgers1d    ood_param fixed              B= 0.4  0.1609 / 0.388
+  burgers1d    ood_param oracle             B= 0.1  0.2115 / 0.100
+  burgers1d    ood_param oracle             B= 0.2  0.2064 / 0.200
+  burgers1d    ood_param oracle             B= 0.4  0.1938 / 0.400
+  burgers1d    ood_param ranked_calibrated  B= 0.1  0.2121 / 0.100
+  burgers1d    ood_param ranked_calibrated  B= 0.2  0.2043 / 0.200
+  burgers1d    ood_param ranked_calibrated  B= 0.4  0.1862 / 0.400
+  burgers1d    ood_param ranked_ensemble    B= 0.1  0.1838 / 0.100
+  burgers1d    ood_param ranked_ensemble    B= 0.2  0.1602 / 0.200
+  burgers1d    ood_param ranked_ensemble    B= 0.4  0.1081 / 0.400
+  burgers1d    ood_param ranked_residual    B= 0.1  0.1950 / 0.100
+  burgers1d    ood_param ranked_residual    B= 0.2  0.1799 / 0.200
+  burgers1d    ood_param ranked_residual    B= 0.4  0.1508 / 0.400
+  burgers1d    ood_param reanchor           B= 0.1  0.2131 / 0.100
+  burgers1d    ood_param reanchor           B= 0.2  0.1935 / 0.200
+  burgers1d    ood_param reanchor           B= 0.4  0.1668 / 0.400
+  burgers1d    test      adaptive           B=0.05  0.0535 / 0.025
+  burgers1d    test      adaptive           B= 0.1  0.0478 / 0.056
+  burgers1d    test      adaptive           B= 0.2  0.0385 / 0.121
+  burgers1d    test      adaptive           B= 0.4  0.0257 / 0.274
+  burgers1d    test      brace              B=0.05  0.0451 / 0.050
+  burgers1d    test      brace              B= 0.1  0.0397 / 0.100
+  burgers1d    test      brace              B= 0.2  0.0322 / 0.200
+  burgers1d    test      brace              B= 0.4  0.0215 / 0.400
+  burgers1d    test      brace_combo        B=0.05  0.0452 / 0.050
+  burgers1d    test      brace_combo        B= 0.1  0.0391 / 0.100
+  burgers1d    test      brace_combo        B= 0.2  0.0312 / 0.200
+  burgers1d    test      brace_combo        B= 0.4  0.0200 / 0.400
+  burgers1d    test      early              B=0.05  0.0587 / 0.050
+  burgers1d    test      early              B= 0.1  0.0554 / 0.100
+  burgers1d    test      early              B= 0.2  0.0422 / 0.200
+  burgers1d    test      early              B= 0.4  0.0178 / 0.400
+  burgers1d    test      fixed              B=0.05  0.0582 / 0.050
+  burgers1d    test      fixed              B= 0.1  0.0548 / 0.125
+  burgers1d    test      fixed              B= 0.2  0.0475 / 0.218
+  burgers1d    test      fixed              B= 0.4  0.0265 / 0.480
+  burgers1d    test      oracle             B=0.05  0.0509 / 0.050
+  burgers1d    test      oracle             B= 0.1  0.0478 / 0.100
+  burgers1d    test      oracle             B= 0.2  0.0426 / 0.200
+  burgers1d    test      oracle             B= 0.4  0.0345 / 0.400
+  burgers1d    test      ranked_calibrated  B=0.05  0.0513 / 0.050
+  burgers1d    test      ranked_calibrated  B= 0.1  0.0472 / 0.100
+  burgers1d    test      ranked_calibrated  B= 0.2  0.0418 / 0.200
+  burgers1d    test      ranked_calibrated  B= 0.4  0.0338 / 0.400
+  burgers1d    test      ranked_ensemble    B=0.05  0.0455 / 0.050
+  burgers1d    test      ranked_ensemble    B= 0.1  0.0387 / 0.100
+  burgers1d    test      ranked_ensemble    B= 0.2  0.0298 / 0.200
+  burgers1d    test      ranked_ensemble    B= 0.4  0.0188 / 0.400
+  burgers1d    test      ranked_residual    B=0.05  0.0483 / 0.050
+  burgers1d    test      ranked_residual    B= 0.1  0.0434 / 0.100
+  burgers1d    test      ranked_residual    B= 0.2  0.0364 / 0.200
+  burgers1d    test      ranked_residual    B= 0.4  0.0275 / 0.400
+  burgers1d    test      reanchor           B=0.05  0.0588 / 0.050
+  burgers1d    test      reanchor           B= 0.1  0.0561 / 0.100
+  burgers1d    test      reanchor           B= 0.2  0.0460 / 0.200
+  burgers1d    test      reanchor           B= 0.4  0.0342 / 0.400
+  burgers1d    test      uniform            B=0.05  0.0492 / 0.050
+  burgers1d    test      uniform            B= 0.1  0.0408 / 0.100
+  burgers1d    test      uniform            B= 0.2  0.0314 / 0.200
+  burgers1d    test      uniform            B= 0.4  0.0210 / 0.400
+
+Budget audit (declared vs realised cost, tol=0.02):
+  adaptive           n= 20  overspent=  0  underspent= 13  delta range=[-0.222, +0.006]
+  brace              n= 20  overspent=  0  underspent=  0  delta range=[+0.000, +0.000]
+  brace_combo        n= 20  overspent=  0  underspent=  0  delta range=[+0.000, +0.000]
+  early              n= 14  overspent=  0  underspent=  0  delta range=[+0.000, +0.000]
+  fixed              n= 20  overspent= 11  underspent=  4  delta range=[-0.089, +0.699]
+  oracle             n= 20  overspent=  0  underspent=  0  delta range=[+0.000, +0.000]
+  ranked_calibrated  n= 20  overspent=  0  underspent=  0  delta range=[+0.000, +0.000]
+  ranked_ensemble    n= 20  overspent=  0  underspent=  0  delta range=[+0.000, +0.000]
+  ranked_residual    n= 20  overspent=  0  underspent=  0  delta range=[+0.000, +0.000]
+  reanchor           n= 20  overspent=  0  underspent=  0  delta range=[+0.000, +0.000]
+  uniform            n= 14  overspent=  0  underspent=  0  delta range=[+0.000, +0.000]
+
+Risk (in-distribution and shifted):
+  advection2d  test      s0  AUROC cal/res/ens = 0.632/0.611/0.525  ECE=0.507  cov=0.879
+  allencahn1d  ood_ic    s0  AUROC cal/res/ens = 0.301/0.961/0.941  ECE=0.011  cov=0.209
+  allencahn1d  ood_param s0  AUROC cal/res/ens = 0.708/0.865/0.376  ECE=0.196  cov=0.550
+  allencahn1d  test      s0  AUROC cal/res/ens = nan/nan/nan  ECE=0.001  cov=0.817
+  burgers1d    ood_ic    s0  AUROC cal/res/ens = 0.993/0.995/0.899  ECE=0.054  cov=0.585
+  burgers1d    ood_param s0  AUROC cal/res/ens = 0.994/0.999/0.708  ECE=0.256  cov=0.430
+  burgers1d    ood_param s1  AUROC cal/res/ens = 0.994/0.999/0.708  ECE=0.271  cov=0.490
+  burgers1d    test      s0  AUROC cal/res/ens = 0.821/0.714/0.666  ECE=0.125  cov=0.929
+  burgers1d    test      s1  AUROC cal/res/ens = 0.801/0.708/0.684  ECE=0.145  cov=0.944
