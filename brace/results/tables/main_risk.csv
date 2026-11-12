@@ -1,4 +1,6 @@
 benchmark,split,seed,n_test,failure_rate,auroc_residual,auroc_ensemble,auroc_calibrated,auroc_brace,ece,brier,conformal_coverage,conformal_upper_coverage
+advection2d,ood_ic,0,28,1,nan,nan,nan,nan,0.00357906,0.00357159,0.00678571,0.965357
+advection2d,ood_param,0,28,0.996786,0.782276,0.404714,0.83608,0.996417,0.347003,0.346727,0.045,0.967143
 advection2d,test,0,40,0.96525,0.611498,0.525452,0.63226,0.883605,0.507378,0.507079,0.8795,0.9585
 allencahn1d,ood_ic,0,28,0.0117857,0.960815,0.940544,0.300747,0.975414,0.0107877,0.0117632,0.208571,1
 allencahn1d,ood_param,0,28,0.196786,0.865385,0.37571,0.707639,0.944103,0.195788,0.196394,0.549643,0.982143

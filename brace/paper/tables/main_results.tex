@@ -12,6 +12,8 @@ burgers1d & test & ensemble-ranked & 0.039/0.10 & 0.030/0.20 & 0.019/0.40 \\
 burgers1d & test & calib.-ranked & 0.047/0.10 & 0.042/0.20 & 0.034/0.40 \\
 burgers1d & test & BRACE & 0.040/0.10 & 0.032/0.20 & 0.021/0.40 \\
 burgers1d & test & BRACE-fusion & 0.039/0.10 & 0.031/0.20 & 0.020/0.40 \\
+burgers1d & test & gain-ranked & 0.043/0.10 & 0.036/0.20 & 0.027/0.40 \\
+burgers1d & test & gain oracle & 0.041/0.10 & 0.033/0.20 & 0.024/0.40 \\
 burgers1d & test & oracle & 0.048/0.10 & 0.043/0.20 & 0.035/0.40 \\
 burgers1d & test & reanchor & 0.056/0.10 & 0.046/0.20 & 0.034/0.40 \\
 \midrule
@@ -23,6 +25,8 @@ burgers1d & ood_param & ensemble-ranked & 0.184/0.10 & 0.160/0.20 & 0.108/0.40 \
 burgers1d & ood_param & calib.-ranked & 0.212/0.10 & 0.204/0.20 & 0.186/0.40 \\
 burgers1d & ood_param & BRACE & 0.186/0.10 & 0.163/0.20 & 0.116/0.40 \\
 burgers1d & ood_param & BRACE-fusion & 0.185/0.10 & 0.160/0.20 & 0.110/0.40 \\
+burgers1d & ood_param & gain-ranked & 0.198/0.10 & 0.184/0.20 & 0.159/0.40 \\
+burgers1d & ood_param & gain oracle & 0.180/0.10 & 0.154/0.20 & 0.109/0.40 \\
 burgers1d & ood_param & oracle & 0.212/0.10 & 0.206/0.20 & 0.194/0.40 \\
 burgers1d & ood_param & reanchor & 0.213/0.10 & 0.194/0.20 & 0.167/0.40 \\
 \midrule
@@ -34,6 +38,8 @@ burgers1d & ood_ic & ensemble-ranked & 0.130/0.10 & 0.106/0.20 & 0.076/0.40 \\
 burgers1d & ood_ic & calib.-ranked & 0.139/0.10 & 0.117/0.20 & 0.096/0.40 \\
 burgers1d & ood_ic & BRACE & 0.137/0.10 & 0.113/0.20 & 0.089/0.40 \\
 burgers1d & ood_ic & BRACE-fusion & 0.136/0.10 & 0.112/0.20 & 0.084/0.40 \\
+burgers1d & ood_ic & gain-ranked & 0.135/0.10 & 0.113/0.20 & 0.088/0.40 \\
+burgers1d & ood_ic & gain oracle & 0.133/0.10 & 0.108/0.20 & 0.077/0.40 \\
 burgers1d & ood_ic & oracle & 0.155/0.10 & 0.140/0.20 & 0.115/0.40 \\
 burgers1d & ood_ic & reanchor & 0.158/0.10 & 0.136/0.20 & 0.108/0.40 \\
 \midrule
@@ -47,6 +53,8 @@ allencahn1d & test & ensemble-ranked & 0.006/0.10 & 0.005/0.20 & 0.003/0.40 \\
 allencahn1d & test & calib.-ranked & 0.007/0.10 & 0.007/0.20 & 0.006/0.40 \\
 allencahn1d & test & BRACE & 0.007/0.10 & 0.006/0.20 & 0.004/0.40 \\
 allencahn1d & test & BRACE-fusion & 0.006/0.10 & 0.005/0.20 & 0.003/0.40 \\
+allencahn1d & test & gain-ranked & 0.007/0.10 & 0.006/0.20 & 0.004/0.40 \\
+allencahn1d & test & gain oracle & 0.007/0.10 & 0.006/0.20 & 0.005/0.40 \\
 allencahn1d & test & oracle & 0.007/0.10 & 0.007/0.20 & 0.006/0.40 \\
 allencahn1d & test & reanchor & 0.006/0.10 & 0.005/0.20 & 0.004/0.40 \\
 \midrule
@@ -60,6 +68,8 @@ allencahn1d & ood_param & ensemble-ranked & 0.026/0.10 & 0.021/0.20 & 0.012/0.40
 allencahn1d & ood_param & calib.-ranked & 0.032/0.10 & 0.031/0.20 & 0.027/0.40 \\
 allencahn1d & ood_param & BRACE & 0.030/0.10 & 0.027/0.20 & 0.021/0.40 \\
 allencahn1d & ood_param & BRACE-fusion & 0.028/0.10 & 0.024/0.20 & 0.017/0.40 \\
+allencahn1d & ood_param & gain-ranked & 0.028/0.10 & 0.025/0.20 & 0.020/0.40 \\
+allencahn1d & ood_param & gain oracle & 0.027/0.10 & 0.021/0.20 & 0.013/0.40 \\
 allencahn1d & ood_param & oracle & 0.032/0.10 & 0.031/0.20 & 0.027/0.40 \\
 allencahn1d & ood_param & reanchor & 0.027/0.10 & 0.023/0.20 & 0.018/0.40 \\
 \midrule
@@ -73,8 +83,55 @@ allencahn1d & ood_ic & ensemble-ranked & 0.010/0.10 & 0.007/0.20 & 0.003/0.40 \\
 allencahn1d & ood_ic & calib.-ranked & 0.011/0.10 & 0.008/0.20 & 0.005/0.40 \\
 allencahn1d & ood_ic & BRACE & 0.010/0.10 & 0.007/0.20 & 0.004/0.40 \\
 allencahn1d & ood_ic & BRACE-fusion & 0.010/0.10 & 0.007/0.20 & 0.004/0.40 \\
+allencahn1d & ood_ic & gain-ranked & 0.010/0.10 & 0.007/0.20 & 0.004/0.40 \\
+allencahn1d & ood_ic & gain oracle & 0.010/0.10 & 0.007/0.20 & 0.003/0.40 \\
 allencahn1d & ood_ic & oracle & 0.014/0.10 & 0.012/0.20 & 0.009/0.40 \\
 allencahn1d & ood_ic & reanchor & 0.011/0.10 & 0.009/0.20 & 0.009/0.40 \\
+\midrule
+advection2d & test & surrogate only & 0.554/0.00 & 0.554/0.00 & 0.554/0.00 \\
+advection2d & test & fixed & 0.458/0.10 & 0.383/0.20 & 0.224/0.45 \\
+advection2d & test & adaptive & 0.537/0.05 & 0.519/0.09 & 0.485/0.18 \\
+advection2d & test & uniform & 0.507/0.10 & 0.459/0.20 & 0.356/0.40 \\
+advection2d & test & early & 0.453/0.10 & 0.361/0.20 & 0.207/0.40 \\
+advection2d & test & residual-ranked & 0.483/0.10 & 0.417/0.20 & 0.305/0.40 \\
+advection2d & test & ensemble-ranked & 0.469/0.10 & 0.393/0.20 & 0.255/0.40 \\
+advection2d & test & calib.-ranked & 0.551/0.10 & 0.539/0.20 & 0.488/0.40 \\
+advection2d & test & BRACE & 0.486/0.10 & 0.417/0.20 & 0.295/0.40 \\
+advection2d & test & BRACE-fusion & 0.483/0.10 & 0.411/0.20 & 0.281/0.40 \\
+advection2d & test & gain-ranked & 0.472/0.10 & 0.406/0.20 & 0.287/0.40 \\
+advection2d & test & gain oracle & 0.454/0.10 & 0.366/0.20 & 0.218/0.40 \\
+advection2d & test & oracle & 0.551/0.10 & 0.539/0.20 & 0.488/0.40 \\
+advection2d & test & reanchor & 0.460/0.10 & 0.389/0.20 & 0.311/0.40 \\
+\midrule
+advection2d & ood_param & surrogate only & 1.195/0.00 & 1.195/0.00 & 1.195/0.00 \\
+advection2d & ood_param & fixed & 0.000/1.00 & 0.000/1.00 & 0.000/1.00 \\
+advection2d & ood_param & adaptive & 1.180/0.06 & 1.157/0.13 & 1.088/0.26 \\
+advection2d & ood_param & uniform & 1.166/0.10 & 1.136/0.20 & 1.039/0.40 \\
+advection2d & ood_param & early & 1.054/0.10 & 0.912/0.20 & 0.625/0.40 \\
+advection2d & ood_param & residual-ranked & 1.146/0.10 & 1.091/0.20 & 0.976/0.40 \\
+advection2d & ood_param & ensemble-ranked & 1.097/0.10 & 1.001/0.20 & 0.793/0.40 \\
+advection2d & ood_param & calib.-ranked & 1.196/0.10 & 1.197/0.20 & 1.201/0.40 \\
+advection2d & ood_param & BRACE & 1.161/0.10 & 1.115/0.20 & 0.998/0.40 \\
+advection2d & ood_param & BRACE-fusion & 1.160/0.10 & 1.116/0.20 & 0.998/0.40 \\
+advection2d & ood_param & gain-ranked & 1.076/0.10 & 0.918/0.20 & 0.626/0.40 \\
+advection2d & ood_param & gain oracle & 1.054/0.10 & 0.912/0.20 & 0.649/0.40 \\
+advection2d & ood_param & oracle & 1.206/0.10 & 1.210/0.20 & 1.186/0.40 \\
+advection2d & ood_param & reanchor & 1.079/0.10 & 1.010/0.20 & 0.960/0.40 \\
+\midrule
+advection2d & ood_ic & surrogate only & 1.289/0.00 & 1.289/0.00 & 1.289/0.00 \\
+advection2d & ood_ic & fixed & 0.066/1.00 & 0.066/1.00 & 0.066/1.00 \\
+advection2d & ood_ic & adaptive & 1.289/0.00 & 1.289/0.00 & 1.289/0.00 \\
+advection2d & ood_ic & uniform & 1.204/0.10 & 1.133/0.20 & 0.988/0.40 \\
+advection2d & ood_ic & early & 1.050/0.10 & 0.863/0.20 & 0.560/0.40 \\
+advection2d & ood_ic & residual-ranked & 1.050/0.10 & 0.863/0.20 & 0.560/0.40 \\
+advection2d & ood_ic & ensemble-ranked & 1.076/0.10 & 0.903/0.20 & 0.650/0.40 \\
+advection2d & ood_ic & calib.-ranked & 1.175/0.10 & 1.082/0.20 & 0.899/0.40 \\
+advection2d & ood_ic & BRACE & 1.155/0.10 & 1.021/0.20 & 0.732/0.40 \\
+advection2d & ood_ic & BRACE-fusion & 1.155/0.10 & 1.020/0.20 & 0.728/0.40 \\
+advection2d & ood_ic & gain-ranked & 1.050/0.10 & 0.863/0.20 & 0.560/0.40 \\
+advection2d & ood_ic & gain oracle & 1.055/0.10 & 0.925/0.20 & 0.725/0.40 \\
+advection2d & ood_ic & oracle & 1.245/0.10 & 1.208/0.20 & 1.115/0.40 \\
+advection2d & ood_ic & reanchor & 1.101/0.10 & 1.023/0.20 & 0.954/0.40 \\
 \midrule
 \bottomrule
 \end{tabular}
