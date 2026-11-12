@@ -270,6 +270,7 @@ def main() -> None:
             else:
                 scores = hz
         else:
+            t_plan = time.time()
             scores = plan_scores(models, u_test, solver, p_test, dt, kind, risk["risk_model"])
         if args.time_weight != "none":
             w = np.linspace(1.0, 0.0, T) if args.time_weight == "early" else np.linspace(0.0, 1.0, T)
