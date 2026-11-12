@@ -97,7 +97,7 @@ class FNO2d(nn.Module):
 class DeepONet1d(nn.Module):
     """Plain DeepONet baseline: branch(field) . trunk(x) + identity path."""
 
-    def __init__(self, n_points: int = 128, p: int = 64, hidden: int = 96,
+    def __init__(self, n_points: int = 128, p: int = 96, hidden: int = 160,
                  delta_scale: float = 0.1):
         super().__init__()
         self.branch = nn.Sequential(

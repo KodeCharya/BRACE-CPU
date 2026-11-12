@@ -8,6 +8,7 @@ import os
 from collections import defaultdict
 
 import numpy as np
+from scipy import stats
 
 from src.evaluation.stats import paired_ci, summarize_seeds
 
@@ -69,7 +70,13 @@ def aggregate(recs):
             "budget": "" if budget is None else budget,
             "n_seeds": len(rs),
             "rel_l2_mean": float(np.mean([r["rel_l2_mean"] for r in rs])),
-            "rel_l2_ci95": float(1.96 * np.std([r["rel_l2_mean"] for r in rs], ddof=1) / np.sqrt(len(rs))) if len(rs) > 1 else 0.0,
+            "rel_l2_seed_min": float(np.min([r["rel_l2_mean"] for r in rs])),
+            "rel_l2_seed_max": float(np.max([r["rel_l2_mean"] for r in rs])),
+            # Seed-level t interval; with two seeds the multiplier is large and
+            # the interval is reported as an honest lower bound on uncertainty.
+            "rel_l2_ci95": (float(stats.t.ppf(0.975, len(rs) - 1)
+                                  * np.std([r["rel_l2_mean"] for r in rs], ddof=1)
+                                  / np.sqrt(len(rs))) if len(rs) > 1 else 0.0),
             "rel_l2_final": float(np.mean([r["rel_l2_final"] for r in rs])),
             "rel_l2_max": float(np.mean([r["rel_l2_max"] for r in rs])),
             "step_failure_rate": float(np.mean([r["step_failure_rate"] for r in rs])),
@@ -77,6 +84,9 @@ def aggregate(recs):
             "cost_fraction": float(np.mean([r["cost_fraction"] for r in rs])),
             "intervention_fraction": float(np.mean([r["intervention_fraction"] for r in rs])),
             "wall_seconds": float(np.mean([r.get("wall_seconds", 0) for r in rs])),
+            "plan_seconds": float(np.mean([r.get("plan_seconds", 0) for r in rs])),
+            "total_seconds": float(np.mean([r.get("total_seconds", r.get("wall_seconds", 0))
+                                            for r in rs])),
         })
     return rows
 
@@ -93,10 +103,17 @@ def paired_analysis(recs):
           for variant in sorted({k[2] for k in idx if k[0] == bench and k[1] == split}):
             for budget in sorted({k[4] for k in idx if k[0] == bench and k[1] == split and k[2] == variant},
                                  key=lambda b: -1 if b is None else b):
-                pairs = [("brace", "neural"), ("brace", "fixed"), ("brace", "ranked_residual"),
-                         ("brace", "ranked_calibrated"), ("brace", "adaptive"),
-                         ("brace", "oracle"), ("ranked_residual", "fixed"),
-                         ("neural", "fixed")]
+                pairs = [
+                    ("brace", "neural"), ("brace", "fixed"), ("brace", "ranked_residual"),
+                    ("brace", "ranked_calibrated"), ("brace", "adaptive"),
+                    ("brace", "oracle"), ("brace", "uniform"), ("brace", "early"),
+                    ("brace", "ranked_ensemble"),
+                    ("brace_combo", "neural"), ("brace_combo", "brace"),
+                    ("brace_combo", "ranked_ensemble"), ("brace_combo", "early"),
+                    ("ranked_ensemble", "neural"), ("uniform", "neural"),
+                    ("early", "neural"), ("ranked_residual", "fixed"),
+                    ("neural", "fixed"),
+                ]
                 for a, b in pairs:
                     diffs, ps, ds = [], [], []
                     for seed in sorted({k[3] for k in idx if k[0] == bench and k[1] == split and k[2] == variant and k[4] == budget}):
@@ -237,6 +254,63 @@ def plot_results(agg, exp_id="main", out_dir="results/figures"):
             plt.close(fig)
 
 
+def plot_budget_fidelity(agg, exp_id, out_dir="results/figures"):
+    """Declared budget versus realised solver cost."""
+    os.makedirs(out_dir, exist_ok=True)
+    for bench in sorted({r["benchmark"] for r in agg}):
+        sub = [r for r in agg if r["benchmark"] == bench and r["budget"] != ""
+               and r.get("variant", "") == ""]
+        if not sub:
+            continue
+        policies = sorted({r["policy"] for r in sub
+                           if r["policy"] in ("fixed", "adaptive", "uniform", "early",
+                                              "ranked_residual", "ranked_ensemble",
+                                              "ranked_calibrated", "brace", "brace_combo",
+                                              "oracle", "reanchor")})
+        fig, ax = plt.subplots(figsize=(5, 4.2))
+        lim = max(float(r["budget"]) for r in sub) * 1.15
+        ax.plot([0, lim], [0, lim], "k--", lw=1, label="declared = realised")
+        for pol in policies:
+            rows = sorted([r for r in sub if r["policy"] == pol], key=lambda r: float(r["budget"]))
+            if not rows:
+                continue
+            ax.plot([float(r["budget"]) for r in rows], [r["cost_fraction"] for r in rows],
+                    marker="o", label=pol)
+        ax.set_xlabel("declared budget $B$")
+        ax.set_ylabel("realised solver cost fraction")
+        ax.set_title(f"budget fidelity: {bench}")
+        ax.legend(fontsize=6, ncol=2)
+        ax.grid(alpha=0.3)
+        fig.tight_layout()
+        fig.savefig(f"{out_dir}/{exp_id}_budget_fidelity_{bench}.png", dpi=150)
+        plt.close(fig)
+
+
+def plot_bar_at_budget(agg, exp_id, budget=0.2, out_dir="results/figures"):
+    for bench in sorted({r["benchmark"] for r in agg}):
+        rows = [r for r in agg if r["benchmark"] == bench
+                and r.get("variant", "") == ""
+                and r["budget"] not in ("",)
+                and abs(float(r["budget"]) - budget) < 1e-9]
+        if not rows:
+            continue
+        rows = sorted(rows, key=lambda r: r["rel_l2_mean"])
+        fig, ax = plt.subplots(figsize=(7, 3.6))
+        x = np.arange(len(rows))
+        vals = np.array([r["rel_l2_mean"] for r in rows])
+        lo = np.array([r["rel_l2_mean"] - r.get("rel_l2_seed_min", r["rel_l2_mean"]) for r in rows])
+        hi = np.array([r.get("rel_l2_seed_max", r["rel_l2_mean"]) - r["rel_l2_mean"] for r in rows])
+        ax.bar(x, vals, yerr=np.vstack([lo, hi]), capsize=3)
+        ax.set_xticks(x)
+        ax.set_xticklabels([r["policy"] for r in rows], rotation=35, ha="right", fontsize=7)
+        ax.set_ylabel("mean relative $L_2$")
+        ax.set_title(f"{bench}: declared budget {budget:g}")
+        ax.grid(axis="y", alpha=0.3)
+        fig.tight_layout()
+        fig.savefig(f"{out_dir}/{exp_id}_bars_B{int(budget*100)}_{bench}.png", dpi=150)
+        plt.close(fig)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--exp-id", default="main")
@@ -247,8 +321,10 @@ def main() -> None:
     agg = aggregate(recs)
     write_csv(f"results/tables/{args.exp_id}_aggregate.csv", agg,
               ["benchmark", "split", "variant", "policy", "budget", "n_seeds", "rel_l2_mean",
-               "rel_l2_ci95", "rel_l2_final", "rel_l2_max", "step_failure_rate",
-               "traj_failure_rate", "cost_fraction", "intervention_fraction", "wall_seconds"])
+               "rel_l2_seed_min", "rel_l2_seed_max", "rel_l2_ci95", "rel_l2_final",
+               "rel_l2_max", "step_failure_rate",
+               "traj_failure_rate", "cost_fraction", "intervention_fraction", "wall_seconds",
+               "plan_seconds", "total_seconds"])
     pairs = paired_analysis(recs)
     write_csv(f"results/tables/{args.exp_id}_paired.csv", pairs,
               ["benchmark", "split", "variant", "budget", "comparison", "mean_diff",
@@ -293,6 +369,9 @@ def main() -> None:
                   ["feature", "mean_auroc", "std_auroc", "n"])
 
     plot_results(agg, args.exp_id)
+    plot_budget_fidelity(agg, args.exp_id)
+    for b in (0.1, 0.2, 0.4):
+        plot_bar_at_budget(agg, args.exp_id, b)
     with open(f"results/processed/{args.exp_id}_summary.json", "w") as f:
         json.dump({"aggregate": agg, "paired": pairs, "risk": rrows}, f, indent=2)
     print(f"aggregated {len(recs)} records -> {len(agg)} groups, {len(pairs)} comparisons")
