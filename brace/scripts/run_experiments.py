@@ -249,7 +249,9 @@ def main() -> None:
         t_plan_end = time.time()
         for B in args.budgets:
             spacing = args.window if args.correction_mode == "window" else 1
-            actions = topk_actions(scores, B, cost_per_action=spacing, min_spacing=spacing)
+            min_start = max(0, spacing - 1) if args.correction_mode == "window" else 0
+            actions = topk_actions(scores, B, cost_per_action=spacing,
+                                   min_spacing=spacing, min_start=min_start)
             res = execute_actions(models, u_test, actions, args.benchmark, p_test, dt,
                                   mode=args.correction_mode, window=args.window)
             rec = _record(policy, B, res, {"plan_seconds": t_plan_end - t_plan,

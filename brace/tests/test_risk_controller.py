@@ -62,6 +62,13 @@ def test_topk_budget_exact_and_spacing():
         idx = np.where(b[i])[0]
         assert np.all(np.diff(idx) >= 5)
 
+    # Window cost may not be truncated at the episode start.
+    c = topk_actions(scores, 0.2, cost_per_action=5, min_spacing=5, min_start=4)
+    for i in range(5):
+        idx = np.where(c[i])[0]
+        assert np.all(idx >= 4)
+        assert np.all(c[i].sum() == 4)
+
 
 def test_adaptive_controller_respects_budget():
     ctrl = AdaptiveBudgetController(n_traj=2, horizon=100, budget=0.1)

@@ -28,11 +28,13 @@ def score_from_features(kind: str, feats: np.ndarray, risk_model: RiskModel | No
 
 
 def topk_actions(scores: np.ndarray, budget_fraction: float, cost_per_action: int = 1,
-                 min_spacing: int = 1) -> np.ndarray:
+                 min_spacing: int = 1, min_start: int = 0) -> np.ndarray:
     """Per-trajectory top-k selection with an exact budget cap.
 
     k = floor(B * T / cost_per_action). ``min_spacing`` prevents overlapping
-    correction windows (spacing 1 = no constraint).
+    correction windows (spacing 1 = no constraint). ``min_start`` forbids
+    actions whose cost would be truncated at the episode boundary, which keeps
+    the realised cost exactly ``k * cost_per_action``.
     """
     n, T = scores.shape
     k = int(np.floor(budget_fraction * T / cost_per_action))
@@ -45,7 +47,7 @@ def topk_actions(scores: np.ndarray, budget_fraction: float, cost_per_action: in
         chosen = 0
         taken = np.zeros(T, dtype=bool)
         for t in order[i]:
-            if taken[t]:
+            if t < min_start or taken[t]:
                 continue
             if min_spacing > 1 and np.any(taken[max(0, t - min_spacing + 1):t + min_spacing]):
                 continue
