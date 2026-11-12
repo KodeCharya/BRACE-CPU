@@ -195,12 +195,47 @@ def deeponet_table(exp_id: str = "deeponet") -> str:
     return "\n".join(lines)
 
 
+def budget_audit_table(exp_id: str = "main") -> str:
+    """Declared versus realised cost, per policy, across all main runs.
+
+    This is the table that supports the budget-fidelity claim; a policy that
+    overspends under shift is visibly distinguishable from one that does not.
+    """
+    rows = read_csv(f"results/tables/{exp_id}_at_budget.csv")
+    stats = {}
+    for r in rows:
+        try:
+            c, b = float(r["cost_fraction"]), float(r["budget"])
+        except (ValueError, KeyError):
+            continue
+        s = stats.setdefault(r["policy"], {"n": 0, "over": 0, "under": 0,
+                                           "max": 0.0, "min": 0.0})
+        d = c - b
+        s["n"] += 1
+        s["max"] = max(s["max"], d)
+        s["min"] = min(s["min"], d)
+        s["over"] += int(d > 0.02)
+        s["under"] += int(-d > 0.02)
+    lines = [r"\begin{tabular}{lrrrrr}", r"\toprule",
+             r"Policy & runs & over & under & max $\Delta$ & min $\Delta$ \\",
+             r"\midrule"]
+    for pol in MAIN_POLICIES + ["gain_ranked", "oracle_gain"]:
+        s = stats.get(pol)
+        if not s:
+            continue
+        lines.append(f"{policy_label(pol)} & {s['n']} & {s['over']} & {s['under']} & "
+                     f"{s['max']:+.3f} & {s['min']:+.3f} \\\\")
+    lines += [r"\bottomrule", r"\end{tabular}"]
+    return "\n".join(lines)
+
+
 def main() -> None:
     os.makedirs("paper/tables", exist_ok=True)
     os.makedirs("paper/figures", exist_ok=True)
     for name, fn in [("main_results", budget_table), ("main_long", main_table),
                      ("risk", risk_table), ("paired", paired_table),
-                     ("ablation", ablation_table), ("deeponet", deeponet_table)]:
+                     ("ablation", ablation_table), ("deeponet", deeponet_table),
+                     ("budget_audit", budget_audit_table)]:
         tex = fn()
         if tex:
             with open(f"paper/tables/{name}.tex", "w") as f:

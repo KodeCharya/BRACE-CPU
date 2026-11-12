@@ -1,6 +1,13 @@
-\begin{tabular}{llrrr}
+\begin{tabular}{llrrrr}
 \toprule
-Policy & $B$ & rel.\ $L_2$ & cost & failure \\
+Policy & $B$ & median rel.\ $L_2$ & mean rel.\ $L_2$ & cost & diverged \\
 \midrule
+surrogate only & -- & 0.285 & 0.371 & 0.00 & 0.03 \\
+ensemble-ranked & 0.1 & 0.278 & 0.313 & 0.10 & 0.00 \\
+ensemble-ranked & 0.2 & 0.265 & 0.298 & 0.20 & 0.00 \\
+ensemble-ranked & 0.4 & 0.229 & 0.254 & 0.40 & 0.00 \\
+BRACE & 0.1 & 0.360 & 0.415 & 0.10 & 0.03 \\
+BRACE & 0.2 & 0.295 & 0.397 & 0.20 & 0.05 \\
+BRACE & 0.4 & 0.185 & 0.195 & 0.40 & 0.00 \\
 \bottomrule
 \end{tabular}
