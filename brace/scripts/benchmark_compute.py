@@ -57,7 +57,7 @@ def main() -> None:
     models["fno2d_w16_m8_l3_32x32"] = model_latency(
         "fno2d", build_model("fno2d", width=16, modes1=8, modes2=8, layers=3),
         torch.randn(24, 32, 32), n=10)
-    models["deeponet1d_p96_h160"] = model_latency(
+    models["deeponet1d_p128"] = model_latency(
         "deeponet1d", build_model("deeponet1d", n_points=128),
         torch.randn(40, 128))
     out["models"] = models
