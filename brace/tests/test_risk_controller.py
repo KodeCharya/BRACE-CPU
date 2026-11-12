@@ -7,7 +7,8 @@ import torch
 
 from src.calibration.conformal import ConformalError, conformal_quantile
 from src.controller.policies import AdaptiveBudgetController, topk_actions
-from src.evaluation.stats import paired_ci
+from src.evaluation.stats import paired_ci, summarize_seeds
+from src.controller.rollout import correction_diagnostics
 from src.uncertainty.risk import RiskModel, auroc
 from src.uncertainty.features import step_error
 
@@ -87,6 +88,30 @@ def test_paired_ci_identical():
     r = paired_ci(a, a.copy())
     assert r["mean_diff"] == 0.0
     assert r["p_value"] == 1.0
+
+
+def test_summarize_seeds_uses_t_interval():
+    s = summarize_seeds([1.0, 2.0])
+    # Student t with 1 dof: 12.706 * 0.7071 / sqrt(2)
+    assert s["ci95"] == pytest.approx(6.353, rel=1e-3)
+    assert s["ci95"] > 1.96 * 0.7071 / np.sqrt(2)
+
+
+def test_correction_diagnostics_sign_and_profiles():
+    rng = np.random.default_rng(0)
+    errs = rng.random((4, 20)) + 0.01
+    pre = errs + 0.05
+    actions = np.zeros((4, 20), dtype=bool)
+    actions[:, :10] = True
+    d = correction_diagnostics(errs, pre, actions)
+    assert d["correction_gain_mean"] == pytest.approx(0.05, abs=1e-6)
+    assert d["correction_harm_rate"] == 0.0
+    assert len(d["correction_gain_profile"]) == 20
+    assert d["correction_by_time_profile"][0] == 1.0
+    assert d["correction_by_time_profile"][-1] == 0.0
+
+    none = correction_diagnostics(errs, pre, np.zeros((4, 20), dtype=bool))
+    assert np.isnan(none["correction_gain_mean"])
 
 
 if __name__ == "__main__":

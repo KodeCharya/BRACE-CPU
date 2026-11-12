@@ -48,6 +48,8 @@ def summarize_seeds(values: list[float]) -> dict:
     v = np.asarray(values, dtype=np.float64)
     n = len(v)
     sd = float(v.std(ddof=1)) if n > 1 else 0.0
-    half = float(1.96 * sd / np.sqrt(n)) if n > 1 else 0.0
+    # t interval: with two or three seeds the normal approximation is far too
+    # narrow, so the multiplier is taken from Student's t with n-1 dof.
+    half = (float(stats.t.ppf(0.975, n - 1) * sd / np.sqrt(n)) if n > 1 else 0.0)
     return {"mean": float(v.mean()), "std": sd, "ci95": half, "n_seeds": n,
             "values": v.tolist()}
