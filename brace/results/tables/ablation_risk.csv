@@ -1,0 +1,2 @@
+benchmark,split,seed,n_test,failure_rate,auroc_residual,auroc_ensemble,auroc_calibrated,auroc_brace,ece,brier,conformal_coverage,conformal_upper_coverage
+burgers1d,test,0,40,0.523,0.714448,0.666351,0.799222,0.802901,0.148701,0.196228,0.9505,1

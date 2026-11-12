@@ -16,7 +16,8 @@ SPLITS = [
 ]
 MAIN_POLICIES = ["neural", "fixed", "adaptive", "uniform", "early",
                  "ranked_residual", "ranked_ensemble", "ranked_calibrated",
-                 "brace", "brace_combo", "oracle", "reanchor"]
+                 "brace", "brace_combo", "gain_ranked", "oracle_gain",
+                 "oracle", "reanchor"]
 BUDGETS = ["0.1", "0.2", "0.4"]
 
 
@@ -41,7 +42,8 @@ def fmt_budget(b: str) -> str:
 def policy_label(p: str) -> str:
     return {"ranked_calibrated": "calib.-ranked", "ranked_ensemble": "ensemble-ranked",
             "ranked_residual": "residual-ranked", "brace_combo": "BRACE-fusion",
-            "brace": "BRACE"}.get(p, p)
+            "brace": "BRACE", "gain_ranked": "gain-ranked",
+            "oracle_gain": "gain oracle"}.get(p, p)
 
 
 def _lookup(rows, bench, split, policy, budget):

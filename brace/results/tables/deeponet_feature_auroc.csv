@@ -1,0 +1,10 @@
+feature,mean_auroc,std_auroc,n
+ens_std_mean,0.791498,0,1
+ens_std_max,0.5,0,1
+residual_rel,0.993339,0,1
+conservation_dev,0.633101,0,1
+update_mag,0.397418,0,1
+temporal_inconsistency,0.445638,0,1
+hist_residual,0.991803,0,1
+hist_std,0.940358,0,1
+time_frac,0.983969,0,1

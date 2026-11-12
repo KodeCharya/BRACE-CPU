@@ -15,14 +15,16 @@ import numpy as np
 import torch
 
 from src.controller.policies import quantile_threshold, threshold_actions, topk_actions
-from src.controller.rollout import adaptive_execute, execute_actions, plan_scores
+from src.controller.rollout import (adaptive_execute, counterfactual_gains, execute_actions,
+                                    neural_pass, plan_scores)
 from src.models.fno import build_model
-from src.uncertainty.pipeline import evaluate_risk_on_split, fit_risk_model, residual_solver
+from src.uncertainty.pipeline import (evaluate_risk_on_split, fit_gain_model, fit_risk_model,
+                                      residual_solver)
 from src.uncertainty.features import FEATURE_NAMES
 
 POLICIES = ["neural", "numerical", "fixed", "adaptive", "uniform", "early",
             "ranked_residual", "ranked_ensemble", "ranked_calibrated", "brace",
-            "brace_combo", "oracle", "reanchor"]
+            "brace_combo", "gain_ranked", "oracle_gain", "oracle", "reanchor"]
 
 SCORE_KIND = {
     "ranked_residual": "residual",
@@ -31,6 +33,8 @@ SCORE_KIND = {
     "brace": "horizon",
     "brace_combo": "combo",
     "oracle": "oracle",
+    "gain_ranked": "gain",
+    "oracle_gain": "oracle_gain",
 }
 
 
@@ -153,6 +157,28 @@ def main() -> None:
           f"res={risk_eval['auroc_residual']:.3f} ens={risk_eval['auroc_ensemble']:.3f} "
           f"fail={risk_eval['failure_rate']:.3f} ECE={risk_eval['ece']:.4f}", flush=True)
 
+    # Gain-aware planning is only computed when requested: it needs a gain model
+    # fitted on validation and, for the oracle, one counterfactual pass on test.
+    gain_cache = {}
+    if any(p in ("gain_ranked", "oracle_gain") for p in args.policies):
+        gain = fit_gain_model(models, u_val, args.benchmark, p_val, dt, mask=mask)
+        print(f"[gain] mean one-step gain={gain['mean_gain']:.4f} "
+              f"relative={gain['mean_relative_gain']:.3f}", flush=True)
+        t_gain = time.time()
+        feats_g, errs_g, states_g = neural_pass(models, u_test, solver, p_test, dt,
+                                                store_states=True)
+        Xg = feats_g.reshape(-1, feats_g.shape[-1])
+        if gain["mask"] is not None:
+            Xg = Xg[:, np.asarray(gain["mask"], dtype=bool)]
+        rel_gain = gain["gain_model"].predict_relative(Xg).reshape(feats_g.shape[:2])
+        err_pred = risk["risk_model"].predict_error(
+            feats_g.reshape(-1, feats_g.shape[-1])).reshape(feats_g.shape[:2])
+        gain_cache["learned"] = rel_gain * err_pred
+        gain_cache["plan_seconds"] = time.time() - t_gain
+        if "oracle_gain" in args.policies:
+            gain_cache["oracle"] = counterfactual_gains(states_g, u_test, args.benchmark,
+                                                        p_test, dt)
+
     records = []
     for policy in args.policies:
         if policy in ("neural", "numerical"):
@@ -224,9 +250,11 @@ def main() -> None:
             continue
 
         kind = SCORE_KIND[policy]
-        t_plan = time.time()
-        if kind in ("horizon", "combo"):
-            from src.controller.rollout import neural_pass
+        if kind in ("gain", "oracle_gain"):
+            scores = gain_cache["learned" if kind == "gain" else "oracle"]
+            t_plan = time.time() - gain_cache.get("plan_seconds", 0.0)
+        elif kind in ("horizon", "combo"):
+            t_plan = time.time()
             feats, _ = neural_pass(models, u_test, solver, p_test, dt)
             hz = risk_hz["risk_model"].risk_score(
                 feats.reshape(-1, feats.shape[-1]), mode=args.brace_mode).reshape(feats.shape[:2])

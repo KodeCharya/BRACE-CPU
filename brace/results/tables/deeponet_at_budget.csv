@@ -1,0 +1,10 @@
+benchmark,split,variant,policy,budget,n_seeds,rel_l2_mean,rel_l2_median,divergence_rate,rel_l2_seed_min,rel_l2_seed_max,rel_l2_ci95,cost_fraction,step_failure_rate,correction_gain_mean,correction_harm_rate
+burgers1d,test,,brace,0.1,1,0.414795,0.35973,0.025,0.414795,0.414795,0,0.1,0.84225,0.0237201,0.0475
+burgers1d,test,,brace,0.2,1,0.397449,0.295446,0.05,0.397449,0.397449,0,0.2,0.77975,0.0194935,0.1
+burgers1d,test,,brace,0.4,1,0.194723,0.185295,0,0.194723,0.194723,0,0.4,0.586,0.017231,0.143125
+burgers1d,test,,ranked_ensemble,0.1,1,0.31273,0.278358,0,0.31273,0.31273,0,0.1,0.88025,0.00933848,0.1275
+burgers1d,test,,ranked_ensemble,0.2,1,0.297914,0.264972,0,0.297914,0.297914,0,0.2,0.87625,0.00599973,0.18125
+burgers1d,test,,ranked_ensemble,0.4,1,0.25417,0.229391,0,0.25417,0.25417,0,0.4,0.828,0.00427096,0.263125
+burgers1d,test,,ranked_residual,0.1,1,0.356758,0.275994,0.025,0.356758,0.356758,0,0.1,0.878,0.0175617,0.075
+burgers1d,test,,ranked_residual,0.2,1,0.329158,0.274043,0.025,0.329158,0.329158,0,0.2,0.87125,0.0102104,0.16125
+burgers1d,test,,ranked_residual,0.4,1,0.260745,0.223565,0,0.260745,0.260745,0,0.4,0.8215,0.00660938,0.21625

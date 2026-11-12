@@ -1,0 +1,7 @@
+benchmark,split,variant,budget,comparison,mean_diff,ci95_across_seeds,n_seeds,cohen_dz_mean,p_min,p_max,seeds_sig_005
+burgers1d,test,,0.1,brace vs ranked_residual,0.0580365,0,1,0.350009,0.03277,0.03277,1
+burgers1d,test,,0.1,brace vs ranked_ensemble,0.102065,0,1,0.436837,0.00869843,0.00869843,1
+burgers1d,test,,0.2,brace vs ranked_residual,0.0682913,0,1,0.141988,0.374691,0.374691,0
+burgers1d,test,,0.2,brace vs ranked_ensemble,0.0995355,0,1,0.206876,0.198397,0.198397,0
+burgers1d,test,,0.4,brace vs ranked_residual,-0.0660217,0,1,-0.68686,9.66005e-05,9.66005e-05,1
+burgers1d,test,,0.4,brace vs ranked_ensemble,-0.0594475,0,1,-0.539925,0.00150303,0.00150303,1

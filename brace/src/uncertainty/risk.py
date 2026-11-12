@@ -137,3 +137,37 @@ class RiskModel:
             "feature_names": self.feature_names,
             "logit_weights": dict(zip(self.feature_names, self.w_logit.tolist())),
         }
+
+
+class GainModel:
+    """Ridge model of the *relative* one-step error reduction from correcting.
+
+    ``gain = e_neural - e_corrected`` and the target is ``gain / e_neural``
+    clipped to [0, 1]. This separates *how risky* a step is (the risk model)
+    from *how much a correction helps there*, which decays as the surrogate
+    state drifts away from the reference trajectory.
+    """
+
+    def __init__(self, l2: float = 1e-2):
+        self.l2 = l2
+        self.mu = None
+        self.sd = None
+        self.w = None
+        self.b = 0.0
+
+    def fit(self, X: np.ndarray, pre_error: np.ndarray, gain: np.ndarray) -> "GainModel":
+        X = np.asarray(X, dtype=np.float64)
+        pre = np.asarray(pre_error, dtype=np.float64).reshape(-1)
+        gain = np.asarray(gain, dtype=np.float64).reshape(-1)
+        y = np.clip(gain / (pre + 1e-8), 0.0, 1.0)
+        self.mu, self.sd = _standardize_fit(X)
+        Z = (X - self.mu) / self.sd
+        n, d = Z.shape
+        A = Z.T @ Z + self.l2 * n * np.eye(d)
+        self.w = np.linalg.solve(A, Z.T @ (y - y.mean()))
+        self.b = float(y.mean())
+        return self
+
+    def predict_relative(self, X: np.ndarray) -> np.ndarray:
+        Z = (np.asarray(X, dtype=np.float64) - self.mu) / self.sd
+        return np.clip(Z @ self.w + self.b, 0.0, 1.0)

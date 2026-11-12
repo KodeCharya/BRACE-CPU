@@ -4,9 +4,9 @@ from __future__ import annotations
 import numpy as np
 
 from ..calibration.conformal import ConformalError
-from ..controller.rollout import neural_pass
+from ..controller.rollout import counterfactual_gains, neural_pass
 from ..correction.numerical import make_solver
-from ..uncertainty.risk import RiskModel, auroc, expected_calibration_error
+from ..uncertainty.risk import GainModel, RiskModel, auroc, expected_calibration_error
 from ..uncertainty.features import FEATURE_NAMES
 from scipy import stats
 
@@ -85,6 +85,28 @@ def fit_risk_model(models, u_val: np.ndarray, benchmark: str, params: dict, dt: 
     }
     return {"risk_model": risk, "conformal": conf, "report": report,
             "features": feats, "errors": errs, "scores": scores}
+
+
+def fit_gain_model(models, u_val: np.ndarray, benchmark: str, params: dict, dt: float,
+                   mask=None) -> dict:
+    """Fit a model of relative one-step correction gain on validation data.
+
+    Gain labels require reference-solver advances and validation ground truth,
+    so they are an *offline* training cost and are never charged to the test
+    budget. The fitted model uses only online features at deployment.
+    """
+    solver = residual_solver(benchmark, dt, n=u_val.shape[-1])
+    params_f = filter_params(benchmark, params)
+    feats, errs, states = neural_pass(models, u_val, solver, params_f, dt, store_states=True)
+    gains = counterfactual_gains(states, u_val, benchmark, params, dt)
+    X = feats.reshape(-1, feats.shape[-1])
+    if mask is not None:
+        X = X[:, np.asarray(mask, dtype=bool)]
+    gm = GainModel().fit(X, errs.reshape(-1), gains.reshape(-1))
+    return {"gain_model": gm, "features": feats, "errors": errs, "gains": gains,
+            "mean_gain": float(gains.mean()),
+            "mean_relative_gain": float(np.mean(gains / (errs + 1e-8))),
+            "mask": mask}
 
 
 def evaluate_risk_on_split(models, u: np.ndarray, benchmark: str, params: dict, dt: float,

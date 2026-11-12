@@ -21,17 +21,23 @@ def _filter_solver_params(solver, params: dict) -> dict:
 
 
 def neural_pass(models, u_ref: np.ndarray, solver, params: dict, dt: float,
-                risk_model=None, device: str = "cpu", store_features: bool = True):
+                risk_model=None, device: str = "cpu", store_features: bool = True,
+                store_states: bool = False):
     """Autoregressive ensemble rollout with no correction.
 
     Returns (features [N,T,F] or None, step_errors [N,T], predictions pre-error).
+    With ``store_states`` the uncorrected states ``[N,T+1,...]`` are returned as
+    a third element, which is needed to compute counterfactual correction gains.
     """
     n, T1 = u_ref.shape[0], u_ref.shape[1]
     T = T1 - 1
     params = _filter_solver_params(solver, params)
     feats = np.zeros((n, T, 9), dtype=np.float64) if store_features else None
     errs = np.zeros((n, T), dtype=np.float64)
+    states = np.zeros_like(u_ref) if store_states else None
     u = u_ref[:, 0].copy()
+    if states is not None:
+        states[:, 0] = u
     u_prev = u.copy()
     hist = new_history(n)
     for t in range(T):
@@ -42,7 +48,34 @@ def neural_pass(models, u_ref: np.ndarray, solver, params: dict, dt: float,
         errs[:, t] = step_error(mean, u_ref[:, t + 1])
         u_prev = u
         u = mean
+        if states is not None:
+            states[:, t + 1] = u
+    if store_states:
+        return feats, errs, states
     return feats, errs
+
+
+def counterfactual_gains(states: np.ndarray, u_ref: np.ndarray, benchmark: str,
+                         params: dict, dt: float) -> np.ndarray:
+    """Per-step error reduction from correcting the uncorrected surrogate state.
+
+    ``states[:, t]`` is the uncorrected surrogate state. For each step we apply
+    one saved interval of the reference solver to that state and compare the
+    resulting one-step error with the surrogate's own one-step error. This is a
+    counterfactual (the closed-loop state would otherwise have been corrected)
+    and is used only for offline gain labels or an oracle diagnostic.
+    """
+    n, T1 = u_ref.shape[0], u_ref.shape[1]
+    T = T1 - 1
+    corrector = Corrector(benchmark, params, dt)
+    gains = np.zeros((n, T))
+    for t in range(T):
+        pre = step_error(states[:, t + 1], u_ref[:, t + 1])
+        for i in range(n):
+            corr = corrector.advance(states[i, t], i, 1)
+            post = step_error(corr[None], u_ref[i:i + 1, t + 1])[0]
+            gains[i, t] = pre[i] - post
+    return gains
 
 
 def plan_scores(models, u_ref, solver, params, dt, score_kind: str, risk_model=None,
@@ -127,7 +160,7 @@ def adaptive_execute(models, u_ref, benchmark: str, params: dict, dt: float, bud
     u = u_ref[:, 0].copy()
     u_prev = u.copy()
     hist = new_history(n)
-    solver = corrector._solver(0) if n else None
+    solver = corrector._solver(0, n=u.shape[-1]) if n else None
     params = _filter_solver_params(solver, params) if solver is not None else params
     errs = np.zeros((n, T))
     pre_errs = np.zeros((n, T))

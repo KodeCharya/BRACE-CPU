@@ -124,6 +124,9 @@ def paired_analysis(recs):
                     ("ranked_ensemble", "neural"), ("uniform", "neural"),
                     ("early", "neural"), ("ranked_residual", "fixed"),
                     ("neural", "fixed"),
+                    ("gain_ranked", "neural"), ("gain_ranked", "ranked_ensemble"),
+                    ("gain_ranked", "early"), ("gain_ranked", "brace"),
+                    ("oracle_gain", "early"), ("oracle_gain", "ranked_ensemble"),
                 ]
                 for a, b in pairs:
                     diffs, ps, ds = [], [], []

@@ -1,0 +1,13 @@
+benchmark,split,variant,budget,comparison,mean_diff,ci95_across_seeds,n_seeds,cohen_dz_mean,p_min,p_max,seeds_sig_005
+burgers1d,test,,0.1,brace vs ranked_residual,-0.00434939,0,1,-0.40528,0.0143418,0.0143418,1
+burgers1d,test,,0.1,brace vs ranked_ensemble,-0.00051814,0,1,-0.0921743,0.563275,0.563275,0
+burgers1d,test,,0.1,brace_combo vs brace,-0.000689167,0,1,-0.230006,0.153758,0.153758,0
+burgers1d,test,,0.1,brace_combo vs ranked_ensemble,-0.00120731,0,1,-0.281401,0.0829127,0.0829127,0
+burgers1d,test,,0.2,brace vs ranked_residual,-0.00487148,0,1,-0.354941,0.0305234,0.0305234,1
+burgers1d,test,,0.2,brace vs ranked_ensemble,0.00152455,0,1,0.305184,0.0608837,0.0608837,0
+burgers1d,test,,0.2,brace_combo vs brace,-0.00104315,0,1,-0.357608,0.0293663,0.0293663,1
+burgers1d,test,,0.2,brace_combo vs ranked_ensemble,0.000481401,0,1,0.135743,0.395855,0.395855,0
+burgers1d,test,,0.4,brace vs ranked_residual,-0.00598077,0,1,-0.433491,0.00918042,0.00918042,1
+burgers1d,test,,0.4,brace vs ranked_ensemble,0.00151663,0,1,0.347576,0.0339313,0.0339313,1
+burgers1d,test,,0.4,brace_combo vs brace,-0.00186724,0,1,-0.497707,0.00314936,0.00314936,1
+burgers1d,test,,0.4,brace_combo vs ranked_ensemble,-0.000350608,0,1,-0.131391,0.411039,0.411039,0

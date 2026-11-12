@@ -9,7 +9,7 @@ from src.calibration.conformal import ConformalError, conformal_quantile
 from src.controller.policies import AdaptiveBudgetController, topk_actions
 from src.evaluation.stats import paired_ci, summarize_seeds
 from src.controller.rollout import correction_diagnostics
-from src.uncertainty.risk import RiskModel, auroc
+from src.uncertainty.risk import GainModel, RiskModel, auroc
 from src.uncertainty.features import step_error
 
 
@@ -123,3 +123,16 @@ def test_correction_diagnostics_sign_and_profiles():
 
 if __name__ == "__main__":
     raise SystemExit(pytest.main([__file__, "-q"]))
+
+
+def test_gain_model_learns_relative_gain():
+    rng = np.random.default_rng(0)
+    X = rng.normal(size=(600, 9))
+    pre = 0.05 + 0.1 * rng.random(600)
+    rel = 1.0 / (1.0 + np.exp(-2.0 * X[:, 2]))  # residual feature drives gain
+    gain = rel * pre
+    gm = GainModel().fit(X[:400], pre[:400], gain[:400])
+    pred = gm.predict_relative(X[400:])
+    order = np.argsort(pred)
+    assert pred[order[-10:]].mean() > pred[order[:10]].mean() + 0.2
+    assert np.all((pred >= 0.0) & (pred <= 1.0))
