@@ -173,19 +173,22 @@ def ablation_table(exp_id: str = "ablation") -> str:
 def deeponet_table(exp_id: str = "deeponet") -> str:
     rows = read_csv(f"results/tables/{exp_id}_at_budget.csv")
     agg = read_csv(f"results/tables/{exp_id}_aggregate.csv")
-    lines = [r"\begin{tabular}{llrrr}", r"\toprule",
-             r"Policy & $B$ & rel.\ $L_2$ & cost & failure \\", r"\midrule"]
+    lines = [r"\begin{tabular}{llrrrr}", r"\toprule",
+             r"Policy & $B$ & median rel.\ $L_2$ & mean rel.\ $L_2$ & cost & diverged \\",
+             r"\midrule"]
     base = [r for r in agg if r["benchmark"] == "burgers1d" and r["split"] == "test"
             and r["policy"] == "neural"]
     if base:
-        lines.append(f"surrogate only & -- & {fmt(base[0]['rel_l2_mean'])} & 0.00 & "
-                     f"{fmt(base[0]['step_failure_rate'])} \\\\")
+        lines.append(f"surrogate only & -- & {fmt(base[0]['rel_l2_median'])} & "
+                     f"{fmt(base[0]['rel_l2_mean'])} & 0.00 & "
+                     f"{fmt(base[0]['divergence_rate'],2)} \\\\")
     for pol in ["ranked_ensemble", "brace"]:
         for b in BUDGETS:
             r = _lookup(rows, "burgers1d", "test", pol, b)
             if r:
-                lines.append(f"{policy_label(pol)} & {b} & {fmt(r['rel_l2_mean'])} & "
-                             f"{fmt(r['cost_fraction'],2)} & {fmt(r['step_failure_rate'])} \\\\")
+                lines.append(f"{policy_label(pol)} & {b} & {fmt(r['rel_l2_median'])} & "
+                             f"{fmt(r['rel_l2_mean'])} & {fmt(r['cost_fraction'],2)} & "
+                             f"{fmt(r['divergence_rate'],2)} \\\\")
     lines += [r"\bottomrule", r"\end{tabular}"]
     return "\n".join(lines)
 

@@ -203,6 +203,9 @@ def summarize(errs, pre_errs, cost_fraction, actions, fail_tau=0.1) -> dict:
     per_traj_final = errs[:, -1]
     return {
         "rel_l2_mean": float(per_traj_mean.mean()),
+        "rel_l2_median": float(np.median(per_traj_mean)),
+        "rel_l2_p90": float(np.quantile(per_traj_mean, 0.9)),
+        "divergence_rate": float(np.mean(per_traj_mean > 1.0)),
         "rel_l2_std": float(per_traj_mean.std(ddof=1)) if len(per_traj_mean) > 1 else 0.0,
         "rel_l2_final": float(per_traj_final.mean()),
         "rel_l2_max": float(errs.max(axis=1).mean()),

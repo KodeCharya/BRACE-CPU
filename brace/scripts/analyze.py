@@ -77,6 +77,8 @@ def aggregate(recs):
             "rel_l2_mean": float(np.mean([r["rel_l2_mean"] for r in rs])),
             "rel_l2_seed_min": float(np.min([r["rel_l2_mean"] for r in rs])),
             "rel_l2_seed_max": float(np.max([r["rel_l2_mean"] for r in rs])),
+            "rel_l2_median": float(np.mean([r.get("rel_l2_median", r["rel_l2_mean"]) for r in rs])),
+            "divergence_rate": float(np.mean([r.get("divergence_rate", 0.0) for r in rs])),
             # Seed-level t interval; with two seeds the multiplier is large and
             # the interval is reported as an honest lower bound on uncertainty.
             "rel_l2_ci95": (float(stats.t.ppf(0.975, len(rs) - 1)
@@ -372,11 +374,13 @@ def summary_at_budget(agg, exp_id: str):
             continue
         rows.append({"variant": r.get("variant", ""),
                      **{k: r[k] for k in ("benchmark", "split", "policy", "budget", "n_seeds",
-                                          "rel_l2_mean", "rel_l2_seed_min", "rel_l2_seed_max",
+                                          "rel_l2_mean", "rel_l2_median", "divergence_rate",
+                                          "rel_l2_seed_min", "rel_l2_seed_max",
                                           "rel_l2_ci95", "cost_fraction", "step_failure_rate",
                                           "correction_gain_mean", "correction_harm_rate")}})
     write_csv(f"results/tables/{exp_id}_at_budget.csv", rows,
               ["benchmark", "split", "variant", "policy", "budget", "n_seeds", "rel_l2_mean",
+               "rel_l2_median", "divergence_rate",
                "rel_l2_seed_min", "rel_l2_seed_max", "rel_l2_ci95", "cost_fraction",
                "step_failure_rate", "correction_gain_mean", "correction_harm_rate"])
 
@@ -391,7 +395,8 @@ def main() -> None:
     agg = aggregate(recs)
     write_csv(f"results/tables/{args.exp_id}_aggregate.csv", agg,
               ["benchmark", "split", "variant", "policy", "budget", "n_seeds", "rel_l2_mean",
-               "rel_l2_seed_min", "rel_l2_seed_max", "rel_l2_ci95", "rel_l2_final",
+               "rel_l2_seed_min", "rel_l2_seed_max", "rel_l2_median", "divergence_rate",
+               "rel_l2_ci95", "rel_l2_final",
                "rel_l2_max", "step_failure_rate",
                "traj_failure_rate", "cost_fraction", "intervention_fraction",
                "pre_rel_l2_mean", "action_time_mean", "correction_gain_mean",

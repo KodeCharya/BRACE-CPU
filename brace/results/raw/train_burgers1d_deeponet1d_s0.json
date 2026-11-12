@@ -1,0 +1,48 @@
+{
+  "tag": "burgers1d_deeponet1d_s0",
+  "benchmark": "burgers1d",
+  "model": "deeponet1d",
+  "members": [
+    {
+      "member": 0,
+      "seed": 0,
+      "val_rel_l2": 20506.275390625,
+      "val_final_rel_l2": 357584.0625,
+      "train_seconds": 482.2074384689331,
+      "epochs": 150,
+      "config": {
+        "benchmark": "burgers1d",
+        "model": "deeponet1d",
+        "members": 1,
+        "seed": 0,
+        "epochs": 150,
+        "stride": 2,
+        "batch_size": 32,
+        "lr": 0.002,
+        "width": 24,
+        "modes": 12,
+        "layers": 3,
+        "downsample_to": 0,
+        "tag": "burgers1d_deeponet1d_s0",
+        "threads": 4
+      }
+    }
+  ],
+  "config": {
+    "benchmark": "burgers1d",
+    "model": "deeponet1d",
+    "members": 1,
+    "seed": 0,
+    "epochs": 150,
+    "stride": 2,
+    "batch_size": 32,
+    "lr": 0.002,
+    "width": 24,
+    "modes": 12,
+    "layers": 3,
+    "downsample_to": 0,
+    "tag": "burgers1d_deeponet1d_s0",
+    "threads": 4
+  },
+  "dt_save": 0.019999999552965164
+}
