@@ -1,0 +1,39 @@
+\begin{tabular}{lllrrr}
+\toprule
+Benchmark & Split & Policy & $B=0.1$ & $B=0.2$ & $B=0.4$ \\
+\midrule
+burgers1d & ood\_ic & surrogate only & 0.175 & 0.175 & 0.175 \\
+burgers1d & ood\_ic & uniform & 0.131/0.10 & 0.107/0.20 & 0.075/0.40 \\
+burgers1d & ood\_ic & early & 0.157/0.10 & 0.131/0.20 & 0.067/0.40 \\
+burgers1d & ood\_ic & residual-ranked & 0.148/0.10 & 0.130/0.20 & 0.100/0.40 \\
+burgers1d & ood\_ic & ensemble-ranked & 0.130/0.10 & 0.106/0.20 & 0.076/0.40 \\
+burgers1d & ood\_ic & BRACE & 0.137/0.10 & 0.113/0.20 & 0.089/0.40 \\
+burgers1d & ood\_ic & BRACE-fusion & 0.136/0.10 & 0.112/0.20 & 0.084/0.40 \\
+burgers1d & ood\_ic & gain-ranked & 0.135/0.10 & 0.113/0.20 & 0.088/0.40 \\
+burgers1d & ood\_ic & gain oracle & 0.133/0.10 & 0.108/0.20 & 0.077/0.40 \\
+burgers1d & ood\_ic & oracle & 0.155/0.10 & 0.140/0.20 & 0.115/0.40 \\
+\midrule
+allencahn1d & ood\_ic & surrogate only & 0.016 & 0.016 & 0.016 \\
+allencahn1d & ood\_ic & uniform & 0.013/0.10 & 0.012/0.20 & 0.008/0.40 \\
+allencahn1d & ood\_ic & early & 0.010/0.10 & 0.007/0.20 & 0.003/0.40 \\
+allencahn1d & ood\_ic & residual-ranked & 0.010/0.10 & 0.007/0.20 & 0.004/0.40 \\
+allencahn1d & ood\_ic & ensemble-ranked & 0.010/0.10 & 0.007/0.20 & 0.003/0.40 \\
+allencahn1d & ood\_ic & BRACE & 0.010/0.10 & 0.007/0.20 & 0.004/0.40 \\
+allencahn1d & ood\_ic & BRACE-fusion & 0.010/0.10 & 0.007/0.20 & 0.004/0.40 \\
+allencahn1d & ood\_ic & gain-ranked & 0.010/0.10 & 0.007/0.20 & 0.004/0.40 \\
+allencahn1d & ood\_ic & gain oracle & 0.010/0.10 & 0.007/0.20 & 0.003/0.40 \\
+allencahn1d & ood\_ic & oracle & 0.014/0.10 & 0.012/0.20 & 0.009/0.40 \\
+\midrule
+advection2d & ood\_ic & surrogate only & 1.289 & 1.289 & 1.289 \\
+advection2d & ood\_ic & uniform & 1.204/0.10 & 1.133/0.20 & 0.988/0.40 \\
+advection2d & ood\_ic & early & 1.050/0.10 & 0.863/0.20 & 0.560/0.40 \\
+advection2d & ood\_ic & residual-ranked & 1.050/0.10 & 0.863/0.20 & 0.560/0.40 \\
+advection2d & ood\_ic & ensemble-ranked & 1.076/0.10 & 0.903/0.20 & 0.650/0.40 \\
+advection2d & ood\_ic & BRACE & 1.155/0.10 & 1.021/0.20 & 0.732/0.40 \\
+advection2d & ood\_ic & BRACE-fusion & 1.155/0.10 & 1.020/0.20 & 0.728/0.40 \\
+advection2d & ood\_ic & gain-ranked & 1.050/0.10 & 0.863/0.20 & 0.560/0.40 \\
+advection2d & ood\_ic & gain oracle & 1.055/0.10 & 0.925/0.20 & 0.725/0.40 \\
+advection2d & ood\_ic & oracle & 1.245/0.10 & 1.208/0.20 & 1.115/0.40 \\
+\midrule
+\bottomrule
+\end{tabular}

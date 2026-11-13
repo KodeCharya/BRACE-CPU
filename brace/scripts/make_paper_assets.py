@@ -21,6 +21,13 @@ MAIN_POLICIES = ["neural", "fixed", "adaptive", "uniform", "early",
 BUDGETS = ["0.1", "0.2", "0.4"]
 
 
+def tx(s) -> str:
+    """Escape text-mode specials in generated label cells (underscores etc.)."""
+    return (str(s).replace("\\", r"\textbackslash{}")
+            .replace("_", r"\_").replace("&", r"\&")
+            .replace("%", r"\%").replace("#", r"\#"))
+
+
 def read_csv(path: str) -> list[dict]:
     if not os.path.exists(path):
         return []
@@ -67,7 +74,7 @@ def budget_table(exp_id: str = "main") -> str:
                 and r["policy"] == "neural"]
         if base:
             cell = f"{fmt(base[0]['rel_l2_mean'])}/0.00"
-            lines.append(f"{bench} & {split} & surrogate only & "
+            lines.append(f"{tx(bench)} & {tx(split)} & surrogate only & "
                          + " & ".join([cell] * len(BUDGETS)) + r" \\")
             any_row = True
         for pol in MAIN_POLICIES:
@@ -80,7 +87,7 @@ def budget_table(exp_id: str = "main") -> str:
                              if r else "--")
             if any(c != "--" for c in cells):
                 any_row = True
-                lines.append(f"{bench} & {split} & {policy_label(pol)} & "
+                lines.append(f"{tx(bench)} & {tx(split)} & {tx(policy_label(pol))} & "
                              + " & ".join(cells) + r" \\")
         if any_row:
             lines.append(r"\midrule")
@@ -103,12 +110,32 @@ def main_table(exp_id: str = "main") -> str:
         for r in sub:
             b = r["budget"] if r["budget"] else "--"
             lines.append(
-                f"{bench} & {split} & {r['policy']} & {b} & "
+                f"{tx(bench)} & {tx(split)} & {tx(r['policy'])} & {b} & "
                 f"{fmt(r['rel_l2_mean'])} & {fmt(r['rel_l2_ci95'])} & "
                 f"{fmt(r['cost_fraction'],2)} & {fmt(r['step_failure_rate'],3)} \\\\"
             )
         lines.append(r"\midrule")
     lines += [r"\bottomrule", r"\end{tabular}"]
+    return "\n".join(lines)
+
+
+def long_table(exp_id: str = "main") -> str:
+    """Full row-per-(policy,budget) listing as a page-breaking longtable."""
+    rows = read_csv(f"results/tables/{exp_id}_aggregate.csv")
+    lines = [r"\begin{longtable}{llllrrrr}", r"\toprule",
+             r"Benchmark & Split & Policy & $B$ & rel.\ $L_2$ & 95\% CI & cost & failure \\",
+             r"\midrule", r"\endhead", r"\bottomrule", r"\endlastfoot"]
+    for bench, split in SPLITS:
+        sub = [r for r in rows if r["benchmark"] == bench and r["split"] == split
+               and r.get("variant", "") == ""]
+        for r in sub:
+            b = r["budget"] if r["budget"] else "--"
+            lines.append(
+                f"{tx(bench)} & {tx(split)} & {tx(r['policy'])} & {b} & "
+                f"{fmt(r['rel_l2_mean'])} & {fmt(r['rel_l2_ci95'])} & "
+                f"{fmt(r['cost_fraction'], 2)} & {fmt(r['step_failure_rate'])} \\\\")
+        lines.append(r"\midrule")
+    lines += [r"\end{longtable}"]
     return "\n".join(lines)
 
 
@@ -134,7 +161,7 @@ def risk_table(exp_id: str = "main") -> str:
                 if v == v:
                     vals.append(v)
             cells.append(f"{sum(vals) / len(vals):.3f}" if vals else "--")
-        lines.append(f"{bench} & {split} & {len(sub)} & " + " & ".join(cells)
+        lines.append(f"{tx(bench)} & {tx(split)} & {len(sub)} & " + " & ".join(cells)
                      + r" \\")
     lines += [r"\bottomrule", r"\end{tabular}"]
     return "\n".join(lines)
@@ -158,8 +185,8 @@ def paired_table(exp_id: str = "main") -> str:
             if comp_norm not in keys and comp not in keys:
                 continue
             lines.append(
-                f"{bench} & {split} & {r['budget'] or '--'} & "
-                f"{comp} & {fmt(r['mean_diff'])} & "
+                f"{tx(bench)} & {tx(split)} & {r['budget'] or '--'} & "
+                f"{tx(comp)} & {fmt(r['mean_diff'])} & "
                 f"{fmt(r['ci95_across_seeds'])} & {fmt(r['cohen_dz_mean'],2)} & "
                 f"{r['seeds_sig_005']}/{r['n_seeds']} \\\\"
             )
@@ -175,7 +202,7 @@ def ablation_table(exp_id: str = "ablation") -> str:
     for r in rows:
         if r["policy"] != "brace":
             continue
-        lines.append(f"{r.get('variant','') or 'full'} & {r['budget']} & "
+        lines.append(f"{tx(r.get('variant','') or 'full')} & {r['budget']} & "
                      f"{fmt(r['rel_l2_mean'])} & {fmt(r['cost_fraction'],2)} & "
                      f"{fmt(r['step_failure_rate'])} \\\\")
     lines += [r"\bottomrule", r"\end{tabular}"]
@@ -198,7 +225,7 @@ def deeponet_table(exp_id: str = "deeponet") -> str:
         for b in BUDGETS:
             r = _lookup(rows, "burgers1d", "test", pol, b)
             if r:
-                lines.append(f"{policy_label(pol)} & {b} & {fmt(r['rel_l2_median'])} & "
+                lines.append(f"{tx(policy_label(pol))} & {b} & {fmt(r['rel_l2_median'])} & "
                              f"{fmt(r['rel_l2_mean'])} & {fmt(r['cost_fraction'],2)} & "
                              f"{fmt(r['divergence_rate'],2)} \\\\")
     lines += [r"\bottomrule", r"\end{tabular}"]
@@ -229,11 +256,11 @@ def budget_audit_table(exp_id: str = "main") -> str:
     lines = [r"\begin{tabular}{lrrrrr}", r"\toprule",
              r"Policy & runs & over & under & max $\Delta$ & min $\Delta$ \\",
              r"\midrule"]
-    for pol in MAIN_POLICIES + ["gain_ranked", "oracle_gain"]:
+    for pol in MAIN_POLICIES:
         s = stats.get(pol)
         if not s:
             continue
-        lines.append(f"{policy_label(pol)} & {s['n']} & {s['over']} & {s['under']} & "
+        lines.append(f"{tx(policy_label(pol))} & {s['n']} & {s['over']} & {s['under']} & "
                      f"{s['max']:+.3f} & {s['min']:+.3f} \\\\")
     lines += [r"\bottomrule", r"\end{tabular}"]
     return "\n".join(lines)
@@ -257,7 +284,7 @@ def compact_table(exp_id: str = "main", splits=None) -> str:
                 and r["policy"] == "neural"]
         if base:
             cell = fmt(base[0]["rel_l2_mean"])
-            lines.append(f"{bench} & {split} & surrogate only & "
+            lines.append(f"{tx(bench)} & {tx(split)} & surrogate only & "
                          f"{cell} & {cell} & {cell} \\\\")
         for pol in COMPACT_POLICIES:
             cells = []
@@ -266,19 +293,22 @@ def compact_table(exp_id: str = "main", splits=None) -> str:
                 cells.append(f"{fmt(r['rel_l2_mean'])}/{fmt(r['cost_fraction'], 2)}"
                              if r else "--")
             if all(c != "--" for c in cells):
-                lines.append(f"{bench} & {split} & {policy_label(pol)} & "
+                lines.append(f"{tx(bench)} & {tx(split)} & {tx(policy_label(pol))} & "
                              + " & ".join(cells) + r" \\")
         lines.append(r"\midrule")
     lines += [r"\bottomrule", r"\end{tabular}"]
     return "\n".join(lines)
 
 
-def ood_table(exp_id: str = "main") -> str:
+def ood_param_table(exp_id: str = "main") -> str:
     return compact_table(exp_id, splits=[("burgers1d", "ood_param"),
-                                          ("burgers1d", "ood_ic"),
                                           ("allencahn1d", "ood_param"),
+                                          ("advection2d", "ood_param")])
+
+
+def ood_ic_table(exp_id: str = "main") -> str:
+    return compact_table(exp_id, splits=[("burgers1d", "ood_ic"),
                                           ("allencahn1d", "ood_ic"),
-                                          ("advection2d", "ood_param"),
                                           ("advection2d", "ood_ic")])
 
 
@@ -286,7 +316,9 @@ def main() -> None:
     os.makedirs("paper/tables", exist_ok=True)
     os.makedirs("paper/figures", exist_ok=True)
     for name, fn in [("main_results", budget_table), ("main_compact", compact_table),
-                     ("ood_compact", ood_table), ("main_long", main_table),
+                     ("ood_param", ood_param_table),
+                     ("ood_ic", ood_ic_table), ("main_long", main_table),
+                     ("main_longtable", long_table),
                      ("risk", risk_table), ("paired", paired_table),
                      ("ablation", ablation_table), ("deeponet", deeponet_table),
                      ("budget_audit", budget_audit_table)]:

@@ -8,8 +8,9 @@ replace the surrogate prediction with one saved interval of the reference
 solver.
 
 The repository contains the full experiment matrix behind the accompanying
-manuscript draft in `paper/`. All numbers in the manuscript are generated from
-`results/raw/` by the scripts in `scripts/`; nothing is hard-coded.
+manuscript draft in `paper/`. All tables and figures in the manuscript are
+generated from `results/raw/` by the scripts in `scripts/`; prose numbers are
+transcribed from the same aggregated CSVs. No result is entered by hand.
 
 ## Headline result
 
@@ -112,8 +113,8 @@ One correction costs exactly one *saved interval* of the reference solver. A
 budget `B` therefore permits `floor(B * T)` step corrections over a horizon of
 `T` saved intervals, and `B = 1` equals running the reference solver for the
 whole horizon. Every ranked policy allocates exactly `floor(B * T)` actions per
-trajectory, so its realised cost equals the declared budget (verified: maximum
-deviation 0.000 across all runs). Window corrections cost `W` intervals and are
+trajectory, so its realised cost equals the declared budget (verified: deviation
+below 0.001 across all runs). Window corrections cost `W` intervals and are
 constrained to start at `t >= W-1` so no window is truncated; re-anchoring at
 step `t` costs `t+1` intervals.
 

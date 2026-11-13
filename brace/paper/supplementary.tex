@@ -1,0 +1,81 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=0.9in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{microtype}
+\usepackage[hidelinks]{hyperref}
+\usepackage{longtable}
+
+\title{Supplementary Material:\\Budgeted Correction of Neural PDE Surrogates}
+\author{Anonymous}
+\date{Draft --- \today}
+
+\begin{document}
+\maketitle
+
+This supplement contains the complete result tables. Every table is generated
+from \texttt{results/tables/*.csv} by
+\texttt{scripts/make\_paper\_assets.py}; no value is entered by hand.
+
+\section{Full main grid}
+
+All policies, all splits, all budgets. Cell format is relative $L_2$ error /
+realised cost. The \texttt{fixed} baseline is \emph{not} budget-aware; its
+realised cost is the number shown and can exceed the declared budget by a large
+margin.
+
+\begin{center}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\input{tables/main_longtable}
+\end{center}
+
+\section{Risk model and calibration}
+
+AUROC is undefined when a split has no failures (Allen--Cahn test) or when every
+step fails (advection--diffusion \texttt{ood\_ic}); those cells are shown
+as \texttt{--}. Coverage is empirical coverage of the split-conformal interval
+at nominal $0.9$; the guarantee requires exchangeability, which the shifted
+splits violate.
+
+\begin{center}
+\footnotesize
+\input{tables/risk}
+\end{center}
+
+\section{Paired comparisons}
+
+Differences are $a-b$ over identical trajectories; the interval is across
+seeds where more than one seed exists. ``sig.'' counts seeds with a paired
+$p<0.05$.
+
+\begin{center}
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\input{tables/paired}
+\end{center}
+
+\section{Ablations}
+
+\begin{center}
+\footnotesize
+\input{tables/ablation}
+\end{center}
+
+\section{Budget audit}
+
+\begin{center}
+\footnotesize
+\input{tables/budget_audit}
+\end{center}
+
+\section{DeepONet (exploratory, one member)}
+
+\begin{center}
+\footnotesize
+\input{tables/deeponet}
+\end{center}
+
+\end{document}

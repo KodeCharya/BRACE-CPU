@@ -20,22 +20,26 @@ Burgers-1D, test split, surrogate-only error 0.0611:
 | gain oracle | 0.0459 | 0.0406 | 0.0332 | 0.0242 |
 | true-error oracle | 0.0509 | 0.0478 | 0.0426 | 0.0345 |
 
-Every ranked policy realises its declared budget exactly (max deviation 0.000
-over all 20 main runs per policy). The `fixed` threshold baseline is **not**
-budget-aware: it overspends in 11 of 20 runs by up to +0.699, reaching cost 1.00
-(and error 0) on shifted splits. `adaptive` underspends in 13 of 20 runs by up
-to 0.222.
+Every ranked policy realises its declared budget exactly (max deviation < 0.001
+over all 30 main runs per policy). The `fixed` threshold baseline is **not**
+budget-aware: it overspends in 19 of 30 runs by up to +0.900 (and underspends in
+4 by up to 0.089), reaching cost 1.00 on seven shifted runs; on two of them its
+error is at machine precision. `adaptive` underspends in 23 of 30 runs by up to
+0.400.
 
 ## 2. The learned risk model does not beat a training-free score
 
-- At B ≤ 0.2 the training-free **ensemble-disagreement** ranking is the best or
-  tied-best policy on all three in-distribution benchmarks.
+- At B = 0.1/0.2 the training-free **ensemble-disagreement** ranking beats the
+  calibrated horizon-risk model on all three in-distribution benchmarks; on
+  Burgers and Allen–Cahn it is the best or tied-best policy, while on
+  advection–diffusion front-loading is already better at every budget.
 - The calibrated horizon-risk model (`brace`) is 0.0451/0.0397/0.0322/0.0215 on
   Burgers test, i.e. within 1–4% of ensemble ranking but never clearly ahead;
   at B = 0.4 it is 14% worse than `early`.
-- Fusing the two (`brace_combo`) does not help: the paired difference against
-  ensemble ranking is +0.0005/+0.0014/+0.0012 on Burgers test, all with CIs
-  spanning zero (one of two seeds significant at B ≥ 0.2, `d_z = 0.31/0.43`).
+- Fusing the two (`brace_combo`) does not help: the paired differences against
+  ensemble ranking on Burgers test are −0.0003/+0.0005/+0.0014/+0.0012 at
+  B = 0.05/0.1/0.2/0.4; none is a significant improvement, and the last two are
+  significantly worse on at least one seed (`d_z = 0.31/0.43`).
 - `ranked_calibrated` (step risk model) and the **true-error oracle** are the
   *worst* ranked policies on advection–diffusion (0.488 and 0.488 at B = 0.4 vs
   0.207 for `early`).
@@ -52,8 +56,8 @@ advection–diffusion, `gain_ranked` is *better* than ensemble ranking
 (1.050 vs 1.076 at B = 0.1; 0.560 vs 0.650 at B = 0.4) — but only because its
 predicted relative-gain scores become nearly constant under shift, so the
 top-k tie-break degenerates into selecting the first *k* steps. Its error equals
-the `early` schedule to four decimals at four separate budget/split points.
-That is not a working gain model; it is a gain model whose output has collapsed
+the `early` schedule to four decimals at all three budgets on that split. That
+is not a working gain model; it is a gain model whose output has collapsed
 and is silently being read as "spend early".
 
 Even the **counterfactual gain oracle loses to the trivial early schedule at
@@ -102,10 +106,10 @@ Empirical conformal coverage at nominal 0.9:
 | ood_param | 0.430 / 0.490 | 0.550 | 0.045 |
 | ood_ic | 0.585 | 0.209 | 0.007 |
 
-Upper-bound coverage stays at 0.96–1.00, so the intervals do not fail in the
-"too narrow" direction that would be dangerous for a safety claim, but the
-point estimates are not exchangeable under shift and the nominal guarantee does
-not transfer.
+Upper-bound coverage is 0.96–1.00 on every split except Burgers `ood_param`,
+where it falls to 0.44–0.50; on that split the interval is unsafe, not merely
+miscalibrated, and the point estimates are not exchangeable under shift, so the
+nominal guarantee does not transfer.
 
 Budget compliance is unaffected by shift for ranked policies (exact by
 construction) but the *benefit* shrinks: on advection–diffusion `ood_param` the

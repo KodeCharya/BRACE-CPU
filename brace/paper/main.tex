@@ -40,8 +40,8 @@ to 0.119 on Burgers), and under distribution shift it becomes
 \emph{anti-correlated} with the surrogate's own error (Spearman $-0.84$ on
 shifted Burgers, $-0.84$ on advection--diffusion), so ranking steps by risk
 systematically targets steps where correcting helps least. Budget compliance is
-exact for ranked allocators, while threshold- and pacing-based baselines violate
-their declared budgets by up to $+0.70$ of the full-solver cost under shift.
+exact for ranked allocators, while the threshold baseline overspends by up to
+$+0.90$ of the full-solver cost and the pacer underspends by up to $0.40$.
 We report all negative and unstable outcomes, including seed counts and
 CPU-only timing caveats.
 \end{abstract}
@@ -89,10 +89,10 @@ properties we consider necessary for a credible answer:
 drops from 0.0611 (surrogate only) to 0.0178--0.0215 at $B=0.4$ depending on the
 allocator. But the sophistication of the allocator does not pay. Ensemble
 disagreement, which requires no training beyond the ensemble itself, matches or
-beats the calibrated horizon-risk model at $B\le 0.2$ on all three benchmarks;
-front-loading wins at $B=0.4$. The learned gain model is worse than ensemble
-ranking in-distribution and degenerates to front-loading under severe shift,
-where its predictions become constant. The gain oracle itself loses to
+beats the calibrated horizon-risk model at $B=0.1/0.2$ on all three benchmarks;
+front-loading is best or tied-best at $B=0.4$. The learned gain model is worse
+than ensemble ranking in-distribution and degenerates to front-loading under
+severe shift, where its predictions become constant. The gain oracle itself loses to
 front-loading at large budgets, so the greedy one-step objective is the wrong
 objective, not merely badly estimated.
 
@@ -109,8 +109,9 @@ front-loading is hard to beat.
 \item A budget-exact hybrid-execution harness with a single comparable cost
   metric and an audit of realised versus declared cost for every policy
   (Section~\ref{sec:cost}, Table~\ref{tab:audit}).
-\item A controlled comparison of eleven allocators plus three oracles on three
-  PDEs and three distributional settings (Section~\ref{sec:results}).
+\item A controlled comparison of the full allocator family
+  (Table~\ref{tab:policies}), including two oracles, on three PDEs and three
+  distributional settings (Section~\ref{sec:results}).
 \item A negative result for learned risk- and gain-based allocation, with
   oracles that bound what any allocator of that family could achieve
   (Sections~\ref{sec:allocation}--\ref{sec:gain}).
@@ -218,7 +219,7 @@ uncorrected rollout.
 \toprule
 Policy & Score & Budget-aware \\
 \midrule
-\texttt{neural} & none & --- \\
+\texttt{neural} & none & n/a \\
 \texttt{numerical} & every step & cost 1.0 \\
 \texttt{fixed} & static threshold on validation residual quantile & no \\
 \texttt{adaptive} & online quantile with cumulative pacing & partially \\
@@ -246,7 +247,7 @@ We report mean relative $L_2$ error over trajectories and horizon
 $\tau=0.1$, the fraction of trajectories with mean relative error above $1$
 (divergence), and realised cost. Seed-level 95\% intervals use Student-$t$ with
 $n-1$ degrees of freedom. Paired comparisons over identical trajectories use a
-$5000$-resample paired bootstrap, a paired $t$-test, Wilcoxon, and Cohen's
+$5000$-resample paired bootstrap~\cite{efron1993bootstrap}, a paired $t$-test, Wilcoxon, and Cohen's
 $d_z$. With a single seed we report point estimates and per-trajectory paired
 intervals, not seed intervals.
 
@@ -290,7 +291,7 @@ full-solver cost. Table~\ref{tab:main} and Figure~\ref{fig:pareto} report the gr
 \caption{In-distribution results: relative $L_2$ error / realised cost.
 `Surrogate only' is the uncorrected rollout. Burgers is a two-seed mean; the
 other rows are single-seed point estimates. The full grid over all splits and
-all policies is in the supplementary table \texttt{main\_results}.}
+all policies, with seed intervals, is in the supplement.}
 \label{tab:main}
 \end{table*}
 
@@ -309,34 +310,42 @@ rather than below.}
 \subsection{The learned risk model does not beat a training-free score}
 \label{sec:allocation}
 
-At $B\le0.2$, ensemble-disagreement ranking is best or tied-best on all three
-in-distribution benchmarks: 0.0387/0.0298 on Burgers test at $B=0.1/0.2$ (vs
-0.0397/0.0322 for the horizon-risk model), 0.0062/0.0050 on Allen--Cahn (vs
-0.0067/0.0059), and 0.4691/0.3929 on advection--diffusion (vs 0.4856/0.4172).
-The paired differences between the horizon-risk model and ensemble ranking on
-Burgers test are $+0.0014$ at $B=0.2$ (95\% CI $[0.0008]$, $d_z=0.31$, one of
-two seeds significant) and $+0.0012$ at $B=0.4$ ($d_z=0.43$): small but
-consistently in favour of the training-free score. Fusing the two
-(\texttt{brace\_combo}) produces the same ordering as ensemble ranking and does
-not improve on it.
+At every budget the training-free ensemble-disagreement ranking is never
+significantly worse than the calibrated horizon-risk model, and at $B=0.1/0.2$
+it is better on all three in-distribution benchmarks: 0.0387/0.0298 on Burgers
+test (vs 0.0397/0.0322), 0.0062/0.0050 on Allen--Cahn (vs 0.0067/0.0059), and
+0.4691/0.3929 on advection--diffusion (vs 0.4856/0.4172). On Burgers test the
+paired difference for the horizon-risk model against ensemble ranking is
+$+0.0024$ at $B=0.2$ (seed-level 95\% half-width $0.0093$, $d_z=0.35$, one of
+two seeds significant) and $+0.0027$ at $B=0.4$ (half-width $0.0020$,
+$d_z=0.43$, both seeds significant). Across the in-distribution grid the only
+place the risk model is nominally ahead is $B=0.05$ on Burgers, by $0.0004$ with
+a paired half-width of $0.002$, i.e.\ not distinguishable. Fusing the two
+(\texttt{brace\_combo}) does not help: on Burgers test its paired differences
+against ensemble ranking are $-0.0003$, $+0.0005$, $+0.0014$ and $+0.0012$ at
+$B=0.05,0.1,0.2,0.4$; none is a significant improvement, and the last two are
+significantly worse on at least one seed.
 
-At $B=0.4$ front-loading becomes the best policy on all three benchmarks
-(0.0178 Burgers, 0.0029 Allen--Cahn, 0.2071 advection--diffusion). This is the
-first indication that \emph{when} the budget is spent dominates \emph{how} it is
-ranked.
+At $B=0.4$ front-loading is best or tied-best on all three benchmarks among
+budget-feasible policies (0.0178 Burgers, 0.0029 Allen--Cahn tied with ensemble
+ranking, 0.2071 advection--diffusion), and on advection--diffusion it is best at
+every budget (0.4530/0.3613/0.2071 at $B=0.1/0.2/0.4, versus
+0.4691/0.3929/0.2552 for ensemble ranking). This is the first indication that
+\emph{when} the budget is spent dominates \emph{how} it is ranked.
 
 \subsection{Learning the gain of a correction makes things worse}
 \label{sec:gain}
 
 The gain model is worse than ensemble ranking at every budget on all three
-in-distribution benchmarks (Burgers test $+0.0018$ to $+0.0081$; Allen--Cahn
-$+0.0002$ to $+0.0015$; advection--diffusion $+0.0021$ to $+0.0322$) and on
+in-distribution benchmarks (Burgers test $+0.0018$ to $+0.0080$; Allen--Cahn
+$+0.0002$ to $+0.0014$; advection--diffusion $+0.0021$ to $+0.0322$) and on
 Burgers \texttt{ood\_param} by $+0.0140$ to $+0.0510$ (both seeds significant,
 $d_z$ up to 2.07). It has one apparent success and it is not one: on severely
 shifted advection--diffusion it beats ensemble ranking (0.560 vs 0.650 at
 $B=0.4$), but its predicted scores become nearly constant under shift, so the
-top-$k$ tie-break selects the first $k$ steps; its error equals the
-\texttt{early} schedule to four decimals at four separate settings. The gain
+top-$k$ tie-break selects the first $k$ steps; on the
+\texttt{ood\_ic} split its error equals the \texttt{early} schedule to four
+decimals at all three budgets. The gain
 model has collapsed, not improved.
 
 Decisively, the gain \emph{oracle} loses to front-loading at large budgets:
@@ -385,40 +394,60 @@ relative to spending early.
 \subsection{Out-of-distribution behaviour}
 \label{sec:ood}
 
-Table~\ref{tab:ood} reports the shifted splits. The ranking picture is unchanged
-at small budgets, and at $B=0.4$ front-loading is again best on every shifted
-setting where it is defined.
+Table~\ref{tab:ood_param} and Table~\ref{tab:ood_ic} report the shifted splits.
+At $B=0.4$ front-loading is best or tied-best on Burgers \texttt{ood\_ic}
+(0.067), both Allen--Cahn shifts (0.012, 0.003), and both
+advection--diffusion shifts (0.625, 0.560); the exception is Burgers
+\texttt{ood\_param}, where ensemble ranking is best (0.108 vs 0.121). At
+$B=0.1/0.2$, ranking policies remain best on the Burgers shifts, while
+front-loading ties ensemble ranking on Allen--Cahn and is best among
+budget-feasible policies on advection--diffusion. The static-threshold
+baseline is best on several shifts only by spending far more than the declared
+budget.
 
 \begin{table*}[t]
 \centering
 \footnotesize
 \setlength{\tabcolsep}{4pt}
-\input{tables/ood_compact}
-\caption{Shifted splits: relative $L_2$ error / realised cost. The `fixed'
+\input{tables/ood_param}
+\caption{Parameter shift: relative $L_2$ error / realised cost. The `fixed'
 threshold baseline is omitted because its realised cost is not the declared
-budget (see Table~\ref{tab:audit}); on several of these splits it reaches cost
+budget (Table~\ref{tab:audit}); on several of these splits it reaches cost
 $1.00$.}
-\label{tab:ood}
+\label{tab:ood_param}
+\end{table*}
+
+\begin{table*}[t]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\input{tables/ood_ic}
+\caption{Initial-condition shift: relative $L_2$ error / realised cost.}
+\label{tab:ood_ic}
 \end{table*}
 
 \paragraph{Calibration fails, compliance holds.} Empirical conformal coverage at
 nominal 0.9 is 0.929/0.944 on Burgers test (two seeds) but 0.430/0.490 on
 \texttt{ood\_param} and 0.585 on \texttt{ood\_ic}; for advection--diffusion it
-falls to 0.045 and 0.007. Upper-bound coverage remains 0.96--1.00, so the
-intervals fail as point estimates, not as unsafe lower bounds. Budget compliance
+falls to 0.045 and 0.007. Upper-bound coverage is 0.96--1.00 on every split
+except Burgers \texttt{ood\_param}, where it falls to 0.44--0.50; on that split
+the interval is unsafe, not merely miscalibrated (full risk table in the
+supplement). Budget compliance
 is unaffected for ranked policies because it is enforced by construction
 (Table~\ref{tab:audit}), but the achievable benefit shrinks: on
-advection--diffusion the surrogate error is 1.195 and the best budgeted
-correction at $B=0.4$ is 0.625.
+advection--diffusion \texttt{ood\_param} the surrogate error is 1.195 and the
+best budgeted correction at $B=0.4$ is 0.625; on \texttt{ood\_ic} the
+corresponding numbers are 1.289 and 0.560.
 
 \paragraph{Threshold baselines silently abandon their budget.}
 Table~\ref{tab:audit} audits declared versus realised cost over all main runs.
-Every ranked policy deviates by at most $0.000$. The static-threshold baseline
-overspends in 11 of 20 runs by up to $+0.699$; under shift it reaches cost
-$1.000$ and error $0$ on three splits, i.e.\ it becomes the reference solver
-while claiming a budget of $0.1$--$0.4$. The paced adaptive baseline underspends
-in 13 of 20 runs by up to $0.222$, leaving budget unused. Both behaviours are
-easy to miss if only error is reported.
+Every ranked policy deviates by less than $0.001$. The static-threshold baseline
+overspends in 19 of 30 runs by up to $+0.900$ (and underspends in 4 by up to
+$0.089$); under shift it reaches cost $1.000$ on seven runs, and on two of them
+its error is at machine precision, i.e.\ it becomes the reference solver while
+claiming a budget of $0.1$--$0.4$. The paced adaptive baseline underspends in
+23 of 30 runs by up to $0.400$, leaving budget unused. Both behaviours are easy
+to miss if only error is reported.
 
 \begin{table}[t]
 \centering
@@ -498,10 +527,10 @@ shift.
 \section{Limitations}
 
 \begin{itemize}
-\item \textbf{Seeds.} Burgers test has two surrogate seeds and \texttt{ood\_ic}
-  one; Allen--Cahn and advection--diffusion have one each. Single-seed cells have
-  no seed-level interval and must not be read as precise. We show point
-  estimates and per-trajectory paired intervals for them.
+\item \textbf{Seeds.} Burgers test and \texttt{ood\_param} have two surrogate
+  seeds and \texttt{ood\_ic} one; Allen--Cahn and advection--diffusion have one
+  each. Single-seed cells have no seed-level interval and must not be read as
+  precise. We show point estimates and per-trajectory paired intervals for them.
 \item \textbf{Ensemble size.} The 2D ensemble has two members, which limits the
   resolution of disagreement as a score; a larger ensemble might change the
   ranking.
@@ -526,16 +555,17 @@ generated from the raw JSON records. Twenty unit tests cover solver accuracy
 (including a batched 2D FFT regression test), conformal coverage on synthetic
 data, budget-exact allocation including the no-truncated-window rule, gain-model
 recovery, the correction diagnostic, and $t$-intervals for small seed counts.
-Every number in this draft is produced by
-\texttt{scripts/make\_paper\_assets.py} from \texttt{results/tables}.
+Every table and figure is generated from \texttt{results/tables} by
+\texttt{scripts/make\_paper\_assets.py}; prose numbers are transcribed from the
+same CSVs and paired-statistics files.
 
 \section{Conclusion}
 
 Budgeted numerical correction of a drifting neural surrogate is effective, but
 the allocation heuristics that motivate ``risk-adaptive'' designs do not help.
-A training-free ensemble-disagreement ranking matches a calibrated horizon-risk
-model; a learned counterfactual-gain model is worse; and the gain oracle itself
-loses to simply spending the budget early. The reason is measurable: the value of
+A training-free ensemble-disagreement ranking matches or beats a calibrated
+horizon-risk model; a learned counterfactual-gain model is worse; and the gain
+oracle itself loses to simply spending the budget early. The reason is measurable: the value of
 a correction decays along the rollout and, under distribution shift, becomes
 anti-correlated with the surrogate's error. The practical lesson is that
 budgeted correction is governed by \emph{when} the budget is spent relative to

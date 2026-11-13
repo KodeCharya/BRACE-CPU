@@ -271,6 +271,9 @@ Main results (rel-L2 / realised cost):
   burgers1d    ood_ic    brace_combo        B= 0.1  0.1362 / 0.100
   burgers1d    ood_ic    brace_combo        B= 0.2  0.1120 / 0.200
   burgers1d    ood_ic    brace_combo        B= 0.4  0.0836 / 0.400
+  burgers1d    ood_ic    early              B= 0.1  0.1574 / 0.100
+  burgers1d    ood_ic    early              B= 0.2  0.1306 / 0.200
+  burgers1d    ood_ic    early              B= 0.4  0.0674 / 0.400
   burgers1d    ood_ic    fixed              B= 0.1  0.1078 / 0.399
   burgers1d    ood_ic    fixed              B= 0.2  0.0916 / 0.523
   burgers1d    ood_ic    fixed              B= 0.4  0.0612 / 0.714
@@ -295,6 +298,9 @@ Main results (rel-L2 / realised cost):
   burgers1d    ood_ic    reanchor           B= 0.1  0.1584 / 0.100
   burgers1d    ood_ic    reanchor           B= 0.2  0.1361 / 0.200
   burgers1d    ood_ic    reanchor           B= 0.4  0.1078 / 0.400
+  burgers1d    ood_ic    uniform            B= 0.1  0.1315 / 0.100
+  burgers1d    ood_ic    uniform            B= 0.2  0.1072 / 0.200
+  burgers1d    ood_ic    uniform            B= 0.4  0.0754 / 0.400
   burgers1d    ood_param adaptive           B= 0.1  0.2038 / 0.059
   burgers1d    ood_param adaptive           B= 0.2  0.1876 / 0.132
   burgers1d    ood_param adaptive           B= 0.4  0.1611 / 0.298
@@ -304,6 +310,9 @@ Main results (rel-L2 / realised cost):
   burgers1d    ood_param brace_combo        B= 0.1  0.1848 / 0.100
   burgers1d    ood_param brace_combo        B= 0.2  0.1601 / 0.200
   burgers1d    ood_param brace_combo        B= 0.4  0.1100 / 0.400
+  burgers1d    ood_param early              B= 0.1  0.2120 / 0.100
+  burgers1d    ood_param early              B= 0.2  0.1854 / 0.200
+  burgers1d    ood_param early              B= 0.4  0.1211 / 0.400
   burgers1d    ood_param fixed              B= 0.1  0.2140 / 0.050
   burgers1d    ood_param fixed              B= 0.2  0.2009 / 0.152
   burgers1d    ood_param fixed              B= 0.4  0.1609 / 0.388
@@ -328,6 +337,9 @@ Main results (rel-L2 / realised cost):
   burgers1d    ood_param reanchor           B= 0.1  0.2131 / 0.100
   burgers1d    ood_param reanchor           B= 0.2  0.1935 / 0.200
   burgers1d    ood_param reanchor           B= 0.4  0.1668 / 0.400
+  burgers1d    ood_param uniform            B= 0.1  0.1980 / 0.100
+  burgers1d    ood_param uniform            B= 0.2  0.1822 / 0.200
+  burgers1d    ood_param uniform            B= 0.4  0.1593 / 0.400
   burgers1d    test      adaptive           B=0.05  0.0535 / 0.025
   burgers1d    test      adaptive           B= 0.1  0.0478 / 0.056
   burgers1d    test      adaptive           B= 0.2  0.0385 / 0.121
@@ -385,7 +397,7 @@ Budget audit (declared vs realised cost, tol=0.02):
   adaptive           n= 30  overspent=  0  underspent= 23  delta range=[-0.400, +0.006]
   brace              n= 30  overspent=  0  underspent=  0  delta range=[+0.000, +0.000]
   brace_combo        n= 30  overspent=  0  underspent=  0  delta range=[+0.000, +0.000]
-  early              n= 24  overspent=  0  underspent=  0  delta range=[+0.000, +0.000]
+  early              n= 30  overspent=  0  underspent=  0  delta range=[+0.000, +0.000]
   fixed              n= 30  overspent= 19  underspent=  4  delta range=[-0.089, +0.900]
   gain_ranked        n= 30  overspent=  0  underspent=  0  delta range=[+0.000, +0.000]
   oracle             n= 30  overspent=  0  underspent=  0  delta range=[+0.000, +0.000]
@@ -394,7 +406,7 @@ Budget audit (declared vs realised cost, tol=0.02):
   ranked_ensemble    n= 30  overspent=  0  underspent=  0  delta range=[+0.000, +0.000]
   ranked_residual    n= 30  overspent=  0  underspent=  0  delta range=[+0.000, +0.000]
   reanchor           n= 30  overspent=  0  underspent=  0  delta range=[+0.000, +0.000]
-  uniform            n= 24  overspent=  0  underspent=  0  delta range=[+0.000, +0.000]
+  uniform            n= 30  overspent=  0  underspent=  0  delta range=[+0.000, +0.000]
 
 Risk (in-distribution and shifted):
   advection2d  ood_ic    s0  AUROC cal/res/ens = nan/nan/nan  ECE=0.004  cov=0.007
